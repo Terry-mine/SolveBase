@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# 运行时数据（注意：绝不把 data/ 放进网盘同步目录）
+data/
+logs/
+*.db
+*.db-wal
+*.db-shm
+
+.env
+.DS_Store
+
+# 前端
+web/node_modules/
+# dist 是构建产物，不入库。换机器后跑一次 build.bat 即可（单进程模式的界面来自这里）
+web/dist/

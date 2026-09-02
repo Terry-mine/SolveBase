@@ -1,0 +1,15 @@
+# 运行 SolveBase 所需的最小依赖（P0 阶段）
+fastapi>=0.141
+uvicorn[standard]>=0.52
+pydantic>=2.13
+pydantic-settings>=2.15
+PyYAML>=6.0
+
+# 开发 / 测试
+pytest>=9.0
+httpx>=0.28
+
+# 以下为后续阶段按需安装，先不装，避免环境臃肿
+# P1 LLM：      openai（DeepSeek/Qwen/GLM 均兼容 OpenAI 接口）
+# P2 Embedding：sentence-transformers 或 FlagEmbedding（本地 bge-m3）
+# P2 Rerank：   FlagEmbedding（bge-reranker-v2-m3）

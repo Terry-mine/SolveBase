@@ -1,0 +1,190 @@
+# SolveBase 受控词表
+#
+# 这是分类体系的唯一事实来源。改分类 = 改这个文件，不需要动任何代码。
+# 改完后执行：`python -m backend.cli seed` 重新写入 vocab 表。
+#
+# 字段说明：
+#   code    稳定标识符，写进数据库，永不改名（label 可以随便改）
+#   label   显示名
+#   desc    什么情况该选它（这段会喂给 LLM 做分类依据）
+#   aliases 同义词，用于把 LLM 的自由输出收敛回标准 code
+#
+# 加分类：在对应类型下追加一项即可。
+# 删分类：不要删，把它标成 deprecated: true，老记录还能正常显示。
+
+version: 1
+
+# 跨类型通用状态（各类型还有自己的专属状态）
+common_statuses:
+  - code: draft
+    label: 草稿
+    desc: 刚捕获，尚未整理
+    aliases: [待整理, 未整理, 待规整, draft, 新建]
+
+types:
+
+  incident:
+    label: 故障案例
+    desc: 出事了，被动排查。有报错、有尝试过程、有解法。
+    statuses:
+      - code: solved
+        label: 已解决
+        aliases: [解决, 解决了, 搞定, 修好了, resolved, fixed, done]
+      - code: workaround
+        label: 绕过
+        desc: 问题没根治，只是绕开了
+        aliases: [规避, 绕开, 临时方案, 权宜之计, worked around]
+      - code: open
+        label: 未解决
+        aliases: [待解决, 没解决, 悬而未决, unresolved, pending, 搁置]
+      - code: regressed
+        label: 已复发
+        aliases: [复发, 又出现, 又坏了, 二次出现, regressed, reappeared]
+    categories:
+      - code: DepsVersion
+        label: 依赖版本
+        desc: 版本冲突、缺库、锁文件、语义化版本踩坑
+        aliases: [依赖, 版本, 包冲突, 依赖问题, 版本问题, 升级]
+      - code: Config
+        label: 配置错误
+        desc: 配置文件、环境变量、启动参数、编码格式写错
+        aliases: [配置, 环境变量, 参数, 配置文件]
+      - code: EnvDiff
+        label: 环境差异
+        desc: 本地正常线上坏、测试正常生产坏、机器之间不一致
+        aliases: [环境差异, 环境不一致, 本地好线上坏, 环境问题]
+      - code: Auth
+        label: 权限认证
+        desc: 鉴权、Token、证书、CORS、ACL、密钥、签名
+        aliases: [权限, 认证, 鉴权, 证书, 密钥, 401, 403]
+      - code: Network
+        label: 网络连通
+        desc: DNS、代理、防火墙、超时、连接池、跨主机访问
+        aliases: [网络, 连通, 超时, 代理, DNS, 防火墙]
+      - code: DataState
+        label: 数据状态
+        desc: 脏数据、迁移、编码、时区、精度、事务、序列化
+        aliases: [数据, 编码, 时区, 脏数据, 迁移, 事务]
+      - code: Concurrency
+        label: 并发时序
+        desc: 竞态、死锁、异步顺序、重试、幂等、消息乱序
+        aliases: [并发, 竞态, 死锁, 时序, 异步, 幂等]
+      - code: Performance
+        label: 性能
+        desc: 慢查询、内存泄漏、GC、N+1、吞吐瓶颈
+        aliases: [性能, 慢, 内存泄漏, 卡顿, 超时慢]
+      - code: Build
+        label: 构建编译
+        desc: 编译、打包、CI/CD、依赖树、构建缓存
+        aliases: [构建, 编译, 打包, CI, 流水线]
+      - code: Container
+        label: 容器编排
+        desc: Docker/K8s、镜像、挂载卷、容器网络、健康检查
+        aliases: [容器, Docker, K8s, Kubernetes, 镜像, 编排]
+      - code: Resource
+        label: 资源容量
+        desc: 磁盘、inode、内存、文件句柄、配额打满
+        aliases: [资源, 磁盘, 内存不足, inode, 句柄, 容量]
+      - code: ExternalAPI
+        label: 第三方服务
+        desc: SDK 版本、限流、接口变更、回调、供应商故障
+        aliases: [第三方, SDK, 外部服务, 限流, API变更]
+      - code: LogicBug
+        label: 逻辑缺陷
+        desc: 纯粹代码写错。这类最不值得存，除非有代表性
+        aliases: [逻辑, bug, 代码错误]
+      - code: Observability
+        label: 监控可观测
+        desc: 日志、指标、链路追踪、告警本身失灵
+        aliases: [监控, 日志, 告警, 链路, 可观测]
+      - code: Backup
+        label: 备份恢复
+        desc: 备份、还原、误删找回
+        aliases: [备份, 恢复, 还原, 误删]
+      - code: Other
+        label: 其他
+        desc: 以上都不合适时的兜底。选中它会触发词表 review
+        aliases: []
+
+  runbook:
+    label: 操作规程
+    desc: 主动要做的一件事。有前置条件、有步骤序列、有回滚方案。
+    statuses:
+      - code: active
+        label: 有效
+        aliases: [在用, 现行, 可用, active, current]
+      - code: needs_update
+        label: 待更新
+        aliases: [需更新, 过期未更新, 待修订, outdated-pending, stale]
+      - code: deprecated
+        label: 已废弃
+        aliases: [废弃, 作废, 不用了, 已下线, deprecated, obsolete]
+    categories:
+      - code: Deploy
+        label: 部署发布
+        desc: 上线、灰度、回滚流程
+        aliases: [部署, 发布, 上线, 灰度]
+      - code: Setup
+        label: 环境搭建
+        desc: 从零搭环境、初始化、 onboarding
+        aliases: [环境搭建, 初始化, 安装]
+      - code: DataOps
+        label: 数据操作
+        desc: 改数据、刷数、迁移、清理
+        aliases: [数据操作, 刷数, 数据迁移]
+      - code: IncidentResponse
+        label: 故障处置
+        desc: 出事时的标准处置动作
+        aliases: [故障处置, 应急, 止血]
+      - code: Scaling
+        label: 扩缩容
+        desc: 扩容、缩容、容量调整
+        aliases: [扩容, 缩容, 容量]
+      - code: Routine
+        label: 巡检维护
+        desc: 定期检查、例行维护
+        aliases: [巡检, 维护, 例行]
+      - code: Other
+        label: 其他
+        desc: 兜底
+        aliases: []
+
+  note:
+    label: 注意事项
+    desc: 平时的讲究和约定。没有报错，没有排查过程，只有结论和原因。
+    statuses:
+      - code: active
+        label: 长期有效
+        aliases: [有效, 仍然适用, 还在用, active, valid]
+      - code: outdated
+        label: 已过时
+        aliases: [过时, 不适用, 失效, outdated, expired, 别再用了]
+    categories:
+      - code: EnvConvention
+        label: 环境约定
+        desc: 团队或项目的环境使用约定
+        aliases: [约定, 环境约定, 规范]
+      - code: Pinning
+        label: 版本锁定
+        desc: 某个版本必须锁死，升级会出事
+        aliases: [版本锁定, 锁版本, 锁定]
+      - code: DangerOp
+        label: 危险操作
+        desc: 高危命令、不可逆操作，做之前必须确认
+        aliases: [危险操作, 高危, 不可逆, 谨慎]
+      - code: PerfTrap
+        label: 性能陷阱
+        desc: 某种写法会踩的性能坑
+        aliases: [性能陷阱, 性能坑, 慢写法]
+      - code: Security
+        label: 安全合规
+        desc: 密钥管理、权限最小化、合规要求
+        aliases: [安全, 合规, 密钥管理]
+      - code: TeamRule
+        label: 协作约定
+        desc: 分支策略、命名、评审、发布窗口
+        aliases: [协作, 分支, 命名, 评审, 约定]
+      - code: Other
+        label: 其他
+        desc: 兜底
+        aliases: []
