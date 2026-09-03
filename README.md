@@ -6,28 +6,40 @@
 
 ## 日常启动（双击就行）
 
-根目录下有 6 个脚本，**日常只会用到前两个**：
+根目录下有 7 个脚本，**日常只会用到前两个**：
 
 | 双击这个 | 干什么 | 什么时候用 |
 |---|---|---|
 | **start.bat** | 启动并自动打开浏览器 → http://127.0.0.1:8787 | 每天记录时 |
 | **stop.bat** | 停掉全部服务 | 不用了 / 要重启 |
+| **status.bat** | 看服务在不在、数据库多大、记录多少 | 怀疑没起来时 |
 | build.bat | 重新构建前端 | 改过 `web/src` 代码之后 |
 | start-dev.bat | 开发模式（后端 8787 + vite 5173 热更新） | 只在改前端代码时 |
 | install-autostart.bat | 注册开机自启 | 一次就够 |
 | uninstall-autostart.bat | 取消开机自启 | 想关掉时 |
 
-**单进程模式**：`start.bat` 只拉起一个 Python 进程（`pythonw.exe scripts/serve_bg.py`），
-后端同时托管 `web/dist` 的界面。所以运行期**不需要 Node**、**只占一个端口 8787**、
-**不留黑窗口**。浏览器直接开 http://127.0.0.1:8787。
+**单进程模式**：`start.bat` 拉起 `pythonw.exe scripts/serve_bg.py`，后端同时托管
+`web/dist` 的界面。所以运行期**不需要 Node**、**只占一个端口 8787**、**不留黑窗口**。
+浏览器直接开 http://127.0.0.1:8787。
 
-启动失败或页面打不开时，第一件事是看 **`logs/server.log`**（无窗口模式下这是唯一的日志出口，
-超过 2MB 自动轮转成 `server.log.1`）。
+> 注意 `http://127.0.0.1:5173` 是**开发服务器**的端口，只有 `start-dev.bat` 才会开。
+> 生产模式（start.bat / 开机自启）不开它，访问必然失败。
+
+**所有 .bat 都只有三四行，且刻意保持纯 ASCII**——逻辑和中文提示全在
+`scripts/launcher.py`（Python，UTF-8 安全）。原因：含中文的 .bat 配 `chcp 65001`
+会被 cmd.exe 在解析途中切代码页而读乱字节，中文必然乱码。不要再往 .bat 里堆逻辑。
+
+出问题先看两个日志：
+
+| 日志 | 记什么 | 什么时候看 |
+|---|---|---|
+| `logs/launcher.log` | 每次 start/stop 的动作、失败原因 | **开机自启没起来、页面打不开** |
+| `logs/server.log` | uvicorn 的请求与报错（超 2MB 轮转成 `server.log.1`） | 接口报错、录入失败 |
 
 开机自启的做法是往「启动」文件夹丢一个静默启动器
 （`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\SolveBase.vbs`）——
-用户级、不需要管理员、不碰注册表、删掉文件即失效。自启时不弹黑窗口、不自动开浏览器，
-把 http://127.0.0.1:8787 存成书签或浏览器主页即可。
+用户级、不需要管理员、不碰注册表、删掉文件即失效。自启时**不弹黑窗口，但会自动打开浏览器**
+打开 http://127.0.0.1:8787。自启若失败，`logs/launcher.log` 会留下原因。
 
 ### 手动命令（脚本背后就是这些）
 
@@ -51,6 +63,19 @@ python -m backend.cli audit     # 只检查词表
 python -m backend.cli reindex   # 重建全文索引
 python -m pytest -q             # 跑全部测试
 ```
+
+启动器也能直接调（.bat 就是转发到它）：
+
+```bash
+python scripts/launcher.py start                  # 启动 + 开浏览器
+python scripts/launcher.py start --no-browser     # 只启动
+python scripts/launcher.py stop                   # 停掉 8787 / 5173 及其残留
+python scripts/launcher.py status                 # 端口 / 进程 / 数据库 / 记录统计
+python scripts/launcher.py install-autostart      # 注册开机自启（生成启动文件夹里的 vbs）
+python scripts/launcher.py uninstall-autostart
+```
+
+`start` 是幂等的：已经在跑就复用，不会起第二个实例去抢端口；发现残留实例会先清理。
 
 ### 两种运行形态
 
@@ -92,15 +117,15 @@ web/                  React + Vite + Tailwind 前端
   vite.config.ts      /api 代理到后端 8787，开发免跨域
   dist/               构建产物，由后端直接托管
 
-scripts/serve_bg.py   无窗口后台启动入口（把日志接到 logs/server.log）
-logs/server.log       运行日志，排查第一站
+scripts/launcher.py   启动器：start / stop / status / build / dev / 自启。所有中文提示都在这里
+scripts/serve_bg.py   无窗口后台服务入口（把日志接到 logs/server.log）
+logs/launcher.log     启动器动作日志（自启失败看这里）
+logs/server.log       服务运行日志（接口报错看这里）
 
-start.bat             日常启动（单进程，自动开浏览器）
-stop.bat              停止全部服务
-build.bat             重新构建前端
-start-dev.bat         开发模式（后端 + vite 热更新）
-start.vbs             静默启动器（无黑窗口，供自启使用）
-install-autostart.bat / uninstall-autostart.bat   开机自启的开关
+start.bat / stop.bat / status.bat / build.bat / start-dev.bat /
+install-autostart.bat / uninstall-autostart.bat
+                      纯 ASCII 转发器，一律 `python scripts/launcher.py <子命令>`
+                      （别往 .bat 里加中文和逻辑，cmd.exe 会把它读乱）
 ```
 
 依赖方向严格单向：`api → services → domain/ports → core`，`adapters → ports`。
