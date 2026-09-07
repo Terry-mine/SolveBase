@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { api } from "@/lib/api"
-import { glowOnMove, useWallpaperParallax } from "@/hooks/usePointer"
+import { useWallpaperParallax } from "@/hooks/usePointer"
 import { useDebounced, useVocabulary } from "@/hooks/useVocabulary"
 import type { ListParams, RecordItem } from "@/types"
 
@@ -104,12 +104,7 @@ export default function App() {
       </FacetSidebar>
 
       {/* 列表区 */}
-      <section
-        className="glass-strong pointer-glow-host flex w-[400px] shrink-0 flex-col border-r border-rule"
-        onPointerMove={glowOnMove}
-      >
-        <div className="pointer-glow" aria-hidden="true" />
-
+      <section className="glass-strong flex w-[400px] shrink-0 flex-col border-r border-rule">
         <div className="space-y-2 border-b border-rule p-3">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -163,12 +158,7 @@ export default function App() {
       </section>
 
       {/* 详情区 */}
-      <section
-        className="glass pointer-glow-host min-w-0 flex-1 overflow-hidden"
-        onPointerMove={glowOnMove}
-      >
-        <div className="pointer-glow" aria-hidden="true" />
-
+      <section className="glass min-w-0 flex-1 overflow-hidden">
         {selected ? (
           <RecordDetail
             record={selected}

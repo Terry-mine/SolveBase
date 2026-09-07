@@ -1,7 +1,6 @@
 import { FileText, ListChecks, StickyNote } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { glowOnMove } from "@/hooks/usePointer"
 import { categoryLabel, statusLabel, statusTone, typeLabel } from "@/lib/labels"
 import { cn, formatTime } from "@/lib/utils"
 import type { RecordItem, Vocabulary } from "@/types"
@@ -56,17 +55,13 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
           <button
             key={item.id}
             onClick={() => onSelect(item.id)}
-            onPointerMove={glowOnMove}
             className={cn(
-              "lift row-glow-host group relative block w-full py-2.5 pl-5 pr-4 text-left",
+              "lift group relative block w-full py-2.5 pl-5 pr-4 text-left",
               selected
                 ? "bg-white/40 bg-gradient-to-br from-ledger/[0.08] via-ledger/[0.04] to-transparent"
                 : "hover:bg-white/50",
             )}
           >
-            {/* 跟随指针的项内柔光 */}
-            <span className="row-glow" aria-hidden="true" />
-
             {/* 状态色条 */}
             <span
               className={cn(

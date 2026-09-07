@@ -1,28 +1,5 @@
 import { useEffect, useRef } from "react"
 
-/** 全局共用一个 rAF 槽位，鼠标移动再快也只按帧写入 CSS 变量 */
-let frame = 0
-
-/**
- * 把指针在元素内的位置写成 CSS 变量 --mx / --my（px）。
- *
- * 刻意不走 React state：pointermove 每秒能触发上百次，
- * 每帧 setState 会把整棵列表重渲染一遍。写 CSS 变量则由合成器直接处理。
- *
- * 注意 currentTarget 必须在同步阶段取出来 —— 事件派发结束后它会被置空。
- */
-export function glowOnMove(e: React.PointerEvent<HTMLElement>) {
-  const el = e.currentTarget
-  const { clientX, clientY } = e
-  if (frame) return
-  frame = requestAnimationFrame(() => {
-    frame = 0
-    const r = el.getBoundingClientRect()
-    el.style.setProperty("--mx", `${clientX - r.left}px`)
-    el.style.setProperty("--my", `${clientY - r.top}px`)
-  })
-}
-
 /** 是否应当关闭动效（尊重系统「减弱动态效果」） */
 export function prefersReducedMotion() {
   return (

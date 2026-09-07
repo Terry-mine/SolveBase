@@ -292,7 +292,7 @@
     position: fixed;
     inset: -36px;
     z-index: 0;
-    background-image: url("/naruto-wallpaper.png");
+    background-image: url("/healing-wallpaper.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -303,9 +303,15 @@
     content: "";
     position: absolute;
     inset: 0;
+    /* 浅色壁纸配深色蒙版会发灰发脏：改用白雾柔化 + 底部极淡暗角收边 */
     background:
-      radial-gradient(118% 96% at 50% 0%, rgba(11, 17, 34, 0.05), rgba(11, 17, 34, 0.30) 92%),
-      linear-gradient(180deg, rgba(11, 17, 34, 0.14), rgba(11, 17, 34, 0.26));
+      radial-gradient(
+        120% 100% at 50% 0%,
+        rgba(255, 255, 255, 0.42) 0%,
+        rgba(255, 255, 255, 0.10) 58%,
+        rgba(30, 41, 59, 0.13) 100%
+      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(15, 23, 42, 0.10));
   }
 
   /* ─────────────────────────────────────────────────────────
@@ -324,8 +330,9 @@
       rgba(255, 255, 255, 0.11) 44%,
       rgba(255, 255, 255, 0.17) 100%
     );
-    backdrop-filter: blur(26px) saturate(185%) brightness(1.08);
-    -webkit-backdrop-filter: blur(26px) saturate(185%) brightness(1.08);
+    /* brightness 只轻微提亮：浅色壁纸经不起 1.08 那种提亮，会过曝发白 */
+    backdrop-filter: blur(26px) saturate(180%) brightness(1.02);
+    -webkit-backdrop-filter: blur(26px) saturate(180%) brightness(1.02);
     border-color: rgba(255, 255, 255, 0.30) !important;
     box-shadow:
       0 20px 54px -20px rgba(9, 14, 30, 0.46),
@@ -342,8 +349,8 @@
       rgba(255, 255, 255, 0.42) 44%,
       rgba(255, 255, 255, 0.50) 100%
     );
-    backdrop-filter: blur(26px) saturate(170%) brightness(1.05);
-    -webkit-backdrop-filter: blur(26px) saturate(170%) brightness(1.05);
+    backdrop-filter: blur(26px) saturate(170%) brightness(1.01);
+    -webkit-backdrop-filter: blur(26px) saturate(170%) brightness(1.01);
     border-color: rgba(255, 255, 255, 0.42) !important;
     box-shadow:
       0 20px 54px -20px rgba(9, 14, 30, 0.38),
@@ -378,47 +385,6 @@
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.55),
       inset 0 -1px 1px rgba(255, 255, 255, 0.15);
-  }
-
-  /* ─────────────────────────────────────────────────────────
-     鼠标跟随光斑：玻璃上唯一会"跟着手走"的光
-     --mx / --my 由 JS 写入，纯 CSS 渲染，不动 React 状态
-     ───────────────────────────────────────────────────────── */
-  .pointer-glow {
-    position: absolute;
-    inset: 0;
-    /* 负层级：压在玻璃背景之上、面板内容之下（同 ::before / ::after） */
-    z-index: -1;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    background: radial-gradient(
-      320px circle at var(--mx, 50%) var(--my, 50%),
-      rgba(255, 255, 255, 0.42) 0%,
-      rgba(255, 255, 255, 0.14) 38%,
-      transparent 70%
-    );
-  }
-  .pointer-glow-host:hover > .pointer-glow,
-  .pointer-glow-host:focus-within > .pointer-glow {
-    opacity: 1;
-  }
-
-  /* ── 列表项：hover 时项内小光斑 + 左侧色条发光 ─────────── */
-  .row-glow {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    background: radial-gradient(
-      180px circle at var(--mx, 50%) var(--my, 50%),
-      hsl(var(--aurora-start) / 0.16) 0%,
-      transparent 70%
-    );
-  }
-  .row-glow-host:hover > .row-glow {
-    opacity: 1;
   }
 
   /* ── 边框流光：选中项 / 重点卡片外沿跑一圈光 ───────────── */
