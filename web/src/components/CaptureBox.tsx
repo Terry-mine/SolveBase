@@ -86,7 +86,7 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
   }
 
   return (
-    <div className="relative border-b border-rule bg-card/80 px-3 py-3.5 backdrop-blur">
+    <div className="relative border-b border-rule bg-white/25 px-3 py-3.5">
       {/* 顶部小光晕 */}
       <div
         aria-hidden
@@ -190,11 +190,18 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
         <Button
           onClick={() => void submit()}
           disabled={busy || titleMissing}
-          className="relative w-full overflow-hidden bg-ledger text-xs shadow-md shadow-ledger/20 hover:bg-ledger-ink disabled:opacity-50"
+          className="group relative w-full overflow-hidden bg-ledger text-xs shadow-md shadow-ledger/20 hover:bg-ledger-ink disabled:opacity-50"
           size="sm"
         >
+          {/* 悬停时一道高光掠过：可点的按钮才掠，禁用态不掠 */}
+          {!busy && !titleMissing && (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 w-1/2 -translate-x-[140%] skew-x-[-18deg] bg-white/30 group-hover:animate-[sheen_1.05s_ease-out]"
+            />
+          )}
           {busy && <Loader2 className="h-3 w-3 animate-spin" />}
-          {titleMissing ? "先填标题" : "存进去"}
+          <span className="relative">{titleMissing ? "先填标题" : "存进去"}</span>
         </Button>
       </div>
 

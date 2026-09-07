@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 注册角度变量：没这个 @property，conic-gradient 的角度无法被插值，
+   边框流光会直接跳变或直接不动（Chrome/Edge/Safari 16.4+ 支持） */
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
 @layer base {
   :root {
     /* ─────────────────────────────────────────────────────────
@@ -274,34 +282,169 @@
     background-position: -1px -1px;
   }
 
-  /* ── 全站壁纸背景（固定铺满 + 暗色蒙版，保证内容可读） ── */
+  /* ─────────────────────────────────────────────────────────
+     全站壁纸背景（固定铺满 + 轻量蒙版）
+     蒙版比原来减重一半以上：压得太狠壁纸就死了，玻璃层后面看不到东西。
+     文字可读性交给玻璃层的 brightness 去兜，而不是靠把壁纸涂黑。
+     inset 留 -36px 是给鼠标视差留的位移余量。
+     ───────────────────────────────────────────────────────── */
   .app-wallpaper {
     position: fixed;
-    inset: 0;
+    inset: -36px;
     z-index: 0;
     background-image: url("/naruto-wallpaper.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
   }
   .app-wallpaper::after {
     content: "";
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(130% 120% at 50% -10%, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.52) 82%),
-      linear-gradient(180deg, rgba(15, 23, 42, 0.30), rgba(15, 23, 42, 0.42));
+      radial-gradient(118% 96% at 50% 0%, rgba(11, 17, 34, 0.05), rgba(11, 17, 34, 0.30) 92%),
+      linear-gradient(180deg, rgba(11, 17, 34, 0.14), rgba(11, 17, 34, 0.26));
   }
 
-  /* ── 玻璃拟态面板：浮于壁纸之上，营造立体/高级感 ──────── */
+  /* ─────────────────────────────────────────────────────────
+     玻璃拟态：分层实现（背景 / 顶部高光 / 内阴影）
+     配方参考 einui 与 Apple Liquid Glass：
+       背景 alpha 只有 0.10~0.20（原来 0.82 几乎全遮，壁纸根本透不出来）
+       backdrop 三件套 blur + saturate + brightness 把壁纸提亮再透出来
+     三层各自独立，缺一层玻璃就"平"了。
+     ───────────────────────────────────────────────────────── */
   .glass {
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(14px) saturate(150%);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
-    border-color: rgba(255, 255, 255, 0.55) !important;
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(
+      158deg,
+      rgba(255, 255, 255, 0.20) 0%,
+      rgba(255, 255, 255, 0.11) 44%,
+      rgba(255, 255, 255, 0.17) 100%
+    );
+    backdrop-filter: blur(26px) saturate(185%) brightness(1.08);
+    -webkit-backdrop-filter: blur(26px) saturate(185%) brightness(1.08);
+    border-color: rgba(255, 255, 255, 0.30) !important;
     box-shadow:
-      0 10px 34px -14px rgba(12, 18, 38, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      0 20px 54px -20px rgba(9, 14, 30, 0.46),
+      0 2px 8px -2px rgba(9, 14, 30, 0.18);
+  }
+
+  /* ── 强玻璃：侧栏这类小字密集区用。白 0.40~0.52，既透壁纸又保可读 ── */
+  .glass-strong {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(
+      158deg,
+      rgba(255, 255, 255, 0.54) 0%,
+      rgba(255, 255, 255, 0.42) 44%,
+      rgba(255, 255, 255, 0.50) 100%
+    );
+    backdrop-filter: blur(26px) saturate(170%) brightness(1.05);
+    -webkit-backdrop-filter: blur(26px) saturate(170%) brightness(1.05);
+    border-color: rgba(255, 255, 255, 0.42) !important;
+    box-shadow:
+      0 20px 54px -20px rgba(9, 14, 30, 0.38),
+      0 2px 8px -2px rgba(9, 14, 30, 0.14);
+  }
+
+  /* 第 2 层：上沿高光带 —— 玻璃"有边缘"的关键 */
+  .glass::before,
+  .glass-strong::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.58) 0%,
+      rgba(255, 255, 255, 0.14) 13%,
+      transparent 40%
+    );
+  }
+
+  /* 第 3 层：内阴影 —— 上下沿各一条反光，撑出厚度 */
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.55),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.15);
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     鼠标跟随光斑：玻璃上唯一会"跟着手走"的光
+     --mx / --my 由 JS 写入，纯 CSS 渲染，不动 React 状态
+     ───────────────────────────────────────────────────────── */
+  .pointer-glow {
+    position: absolute;
+    inset: 0;
+    /* 负层级：压在玻璃背景之上、面板内容之下（同 ::before / ::after） */
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background: radial-gradient(
+      320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0.14) 38%,
+      transparent 70%
+    );
+  }
+  .pointer-glow-host:hover > .pointer-glow,
+  .pointer-glow-host:focus-within > .pointer-glow {
+    opacity: 1;
+  }
+
+  /* ── 列表项：hover 时项内小光斑 + 左侧色条发光 ─────────── */
+  .row-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    background: radial-gradient(
+      180px circle at var(--mx, 50%) var(--my, 50%),
+      hsl(var(--aurora-start) / 0.16) 0%,
+      transparent 70%
+    );
+  }
+  .row-glow-host:hover > .row-glow {
+    opacity: 1;
+  }
+
+  /* ── 边框流光：选中项 / 重点卡片外沿跑一圈光 ───────────── */
+  .beam-border {
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--beam-angle, 0deg),
+      transparent 0deg,
+      hsl(var(--on-dark-accent) / 0.9) 40deg,
+      hsl(var(--aurora-mid) / 0.85) 80deg,
+      transparent 130deg,
+      transparent 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: beam-spin 3.2s linear infinite;
   }
 
   /* ── 顶栏扫光：周期性高光横扫，强化动态感 ────────────── */
@@ -378,7 +521,9 @@
 
   /* 详情页分区卡片：淡边框 + hover 抬起 */
   .detail-card {
-    @apply rounded-lg border border-rule bg-card p-3;
+    @apply rounded-lg border p-3 backdrop-blur-md;
+    background-color: rgba(255, 255, 255, 0.42);
+    border-color: rgba(255, 255, 255, 0.45);
     box-shadow: 0 1px 2px hsl(var(--ink) / 0.04);
     transition:
       box-shadow 0.2s ease,

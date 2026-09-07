@@ -1,6 +1,7 @@
 import { FileText, ListChecks, StickyNote } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
+import { glowOnMove } from "@/hooks/usePointer"
 import { categoryLabel, statusLabel, statusTone, typeLabel } from "@/lib/labels"
 import { cn, formatTime } from "@/lib/utils"
 import type { RecordItem, Vocabulary } from "@/types"
@@ -55,13 +56,17 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
           <button
             key={item.id}
             onClick={() => onSelect(item.id)}
+            onPointerMove={glowOnMove}
             className={cn(
-              "lift relative block w-full py-2.5 pl-5 pr-4 text-left",
+              "lift row-glow-host group relative block w-full py-2.5 pl-5 pr-4 text-left",
               selected
-                ? "bg-gradient-to-br from-ledger/[0.08] via-ledger/[0.04] to-transparent"
-                : "hover:bg-accent/50",
+                ? "bg-white/40 bg-gradient-to-br from-ledger/[0.08] via-ledger/[0.04] to-transparent"
+                : "hover:bg-white/50",
             )}
           >
+            {/* 跟随指针的项内柔光 */}
+            <span className="row-glow" aria-hidden="true" />
+
             {/* 状态色条 */}
             <span
               className={cn(
@@ -80,7 +85,7 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
               </span>
             )}
 
-            <div className="flex items-start gap-2">
+            <div className="relative flex items-start gap-2">
               <Icon
                 className={cn(
                   "mt-[3px] h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110",

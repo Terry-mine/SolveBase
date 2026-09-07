@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { api } from "@/lib/api"
+import { glowOnMove, useWallpaperParallax } from "@/hooks/usePointer"
 import { useDebounced, useVocabulary } from "@/hooks/useVocabulary"
 import type { ListParams, RecordItem } from "@/types"
 
@@ -32,6 +33,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
 
   const debouncedQuery = useDebounced(query, 250)
+  const wallpaperRef = useWallpaperParallax()
 
   const loadList = useCallback(async () => {
     setLoading(true)
@@ -92,8 +94,8 @@ export default function App() {
 
   return (
     <div className="relative z-10 flex h-screen w-full flex-col overflow-hidden">
-      {/* 全站壁纸背景（固定铺满，浮于纸色之上） */}
-      <div className="app-wallpaper" aria-hidden="true" />
+      {/* 全站壁纸背景（固定铺满 + 指针视差，玻璃面板压在它前面） */}
+      <div className="app-wallpaper" ref={wallpaperRef} aria-hidden="true" />
       <BrandBar total={total} />
 
       <div className="relative z-10 flex flex-1 overflow-hidden">
@@ -102,7 +104,12 @@ export default function App() {
       </FacetSidebar>
 
       {/* 列表区 */}
-      <section className="glass flex w-[400px] shrink-0 flex-col border-r border-rule">
+      <section
+        className="glass-strong pointer-glow-host flex w-[400px] shrink-0 flex-col border-r border-rule"
+        onPointerMove={glowOnMove}
+      >
+        <div className="pointer-glow" aria-hidden="true" />
+
         <div className="space-y-2 border-b border-rule p-3">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -156,7 +163,12 @@ export default function App() {
       </section>
 
       {/* 详情区 */}
-      <section className="glass min-w-0 flex-1 overflow-hidden">
+      <section
+        className="glass pointer-glow-host min-w-0 flex-1 overflow-hidden"
+        onPointerMove={glowOnMove}
+      >
+        <div className="pointer-glow" aria-hidden="true" />
+
         {selected ? (
           <RecordDetail
             record={selected}
@@ -197,7 +209,9 @@ function DetailEmpty() {
 
       <div className="relative max-w-md space-y-5 text-center">
         {/* 标题区 */}
-        <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-card shadow-lg shadow-ledger/15 ring-1 ring-rule">
+        <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/60 shadow-lg shadow-ledger/15 ring-1 ring-white/60 backdrop-blur-md">
+          {/* 边框流光：空状态是页面焦点，用一圈跑动的光把视线引过去 */}
+          <span className="beam-border rounded-2xl" aria-hidden="true" />
           <Sparkles className="h-7 w-7 text-ledger" />
           <span className="absolute -right-1 -top-1 h-3 w-3 animate-[glow-pulse_2.4s_ease-in-out_infinite] rounded-full bg-aurora-mid" />
         </div>
@@ -211,15 +225,15 @@ function DetailEmpty() {
 
         {/* 三个引导提示 */}
         <div className="grid grid-cols-1 gap-2 text-left text-[11px] leading-5 text-muted-foreground">
-          <div className="flex items-start gap-2 rounded-md border border-rule bg-card/60 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-md border border-white/45 bg-white/40 px-3 py-2">
             <span className="mt-0.5 text-ledger">▸</span>
             <span>点列表项，或用顶栏搜索框（Ctrl + K）</span>
           </div>
-          <div className="flex items-start gap-2 rounded-md border border-rule bg-card/60 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-md border border-white/45 bg-white/40 px-3 py-2">
             <span className="mt-0.5 text-ledger">▸</span>
             <span>侧栏可按类型 / 状态 / 项目过滤</span>
           </div>
-          <div className="flex items-start gap-2 rounded-md border border-rule bg-card/60 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-md border border-white/45 bg-white/40 px-3 py-2">
             <span className="mt-0.5 text-ledger">▸</span>
             <span>左下角速记框粘一段报错，自动建档</span>
           </div>

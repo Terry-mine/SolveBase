@@ -75,7 +75,7 @@ export function FacetSidebar({ vocab, filters, onChange, counts, children }: Pro
   const categories = activeType ? categoryOptions(vocab, activeType) : []
 
   return (
-    <aside className="glass relative flex w-64 shrink-0 flex-col overflow-hidden border-r">
+    <aside className="glass-strong relative flex w-64 shrink-0 flex-col overflow-hidden border-r">
       {children}
 
       {/* 极淡网格背景，仅下半部分 */}
@@ -155,7 +155,7 @@ export function FacetSidebar({ vocab, filters, onChange, counts, children }: Pro
                 onChange({ ...filters, project: e.target.value || undefined })
               }
               placeholder="输入项目名过滤"
-              className="h-7 w-full rounded-sm border border-input bg-card/80 px-2 text-[11px] placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="h-7 w-full rounded-sm border border-white/45 bg-white/45 px-2 text-[11px] placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
           </Group>
 

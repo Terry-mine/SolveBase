@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { Database } from "lucide-react"
 
+import { CountUp } from "@/components/CountUp"
+
 interface Props {
   total: number
 }
@@ -60,7 +62,7 @@ export function BrandBar({ total }: Props) {
           本地运行中
         </span>
         <span className="data-num">
-          共 <span className="font-bold text-white">{total}</span> 条档案
+          共 <CountUp value={total} className="font-bold text-white" /> 条档案
         </span>
       </div>
 
