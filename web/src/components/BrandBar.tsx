@@ -79,6 +79,9 @@ export function BrandBar({ total }: Props) {
         </div>
       </div>
 
+      {/* 周期性扫光：强化动态感 */}
+      <div className="bar-sweep-ray" aria-hidden="true" />
+
       {/* 底部流动高光线 */}
       <div className="header-underline absolute inset-x-0 bottom-0 h-[2px]" />
     </header>

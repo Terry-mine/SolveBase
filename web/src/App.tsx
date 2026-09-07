@@ -91,16 +91,18 @@ export default function App() {
   )
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+    <div className="relative z-10 flex h-screen w-full flex-col overflow-hidden">
+      {/* 全站壁纸背景（固定铺满，浮于纸色之上） */}
+      <div className="app-wallpaper" aria-hidden="true" />
       <BrandBar total={total} />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="relative z-10 flex flex-1 overflow-hidden">
       <FacetSidebar vocab={vocab} filters={filters} onChange={setFilters} counts={counts}>
         <CaptureBox onCaptured={(id) => void loadList().then(() => setSelectedId(id))} />
       </FacetSidebar>
 
       {/* 列表区 */}
-      <section className="flex w-[400px] shrink-0 flex-col border-r border-rule">
+      <section className="glass flex w-[400px] shrink-0 flex-col border-r border-rule">
         <div className="space-y-2 border-b border-rule p-3">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
