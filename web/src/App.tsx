@@ -154,7 +154,7 @@ export default function App() {
       </section>
 
       {/* 详情区 */}
-      <section className="min-w-0 flex-1 overflow-hidden">
+      <section className="glass min-w-0 flex-1 overflow-hidden">
         {selected ? (
           <RecordDetail
             record={selected}

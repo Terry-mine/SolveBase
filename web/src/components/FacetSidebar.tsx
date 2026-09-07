@@ -75,7 +75,7 @@ export function FacetSidebar({ vocab, filters, onChange, counts, children }: Pro
   const categories = activeType ? categoryOptions(vocab, activeType) : []
 
   return (
-    <aside className="relative flex w-64 shrink-0 flex-col overflow-hidden border-r border-rule">
+    <aside className="glass relative flex w-64 shrink-0 flex-col overflow-hidden border-r">
       {children}
 
       {/* 极淡网格背景，仅下半部分 */}

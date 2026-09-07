@@ -25,7 +25,7 @@ export function BrandBar({ total }: Props) {
   const date = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`
 
   return (
-    <header className="header-gradient relative flex h-14 shrink-0 items-center gap-3 overflow-hidden px-5">
+    <header className="header-gradient relative z-10 flex h-14 shrink-0 items-center gap-3 overflow-hidden px-5">
       {/* 右上角柔和光斑，让渐变有纵深 */}
       <div
         aria-hidden

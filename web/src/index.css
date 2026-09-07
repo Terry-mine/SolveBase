@@ -233,10 +233,14 @@
       hsl(var(--hdr-3)) 100%
     );
     background-size: 200% 100%;
-    animation: gradient-x 14s ease infinite;
+    animation: gradient-x 11s ease infinite;
+    /* 顶部高光 + 底部内阴影，营造浮起的立体感 */
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.25);
   }
 
-  /* 顶栏底部高光线：三色流动 */
+  /* 顶栏底部高光线：三色流动 + 微光 */
   .header-underline {
     background: linear-gradient(
       90deg,
@@ -245,7 +249,8 @@
       hsl(var(--on-dark-warn)) 100%
     );
     background-size: 200% 100%;
-    animation: gradient-x 9s ease infinite;
+    animation: gradient-x 7s ease infinite;
+    box-shadow: 0 0 10px -1px hsl(var(--on-dark-accent) / 0.6);
   }
 
   /* ── 详情页头部：淡极光渐变 ────────────────────────── */
@@ -267,6 +272,58 @@
       linear-gradient(90deg, hsl(var(--rule) / 0.5) 1px, transparent 1px);
     background-size: 16px 16px;
     background-position: -1px -1px;
+  }
+
+  /* ── 全站壁纸背景（固定铺满 + 暗色蒙版，保证内容可读） ── */
+  .app-wallpaper {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: url("/naruto-wallpaper.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .app-wallpaper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(130% 120% at 50% -10%, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.52) 82%),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.30), rgba(15, 23, 42, 0.42));
+  }
+
+  /* ── 玻璃拟态面板：浮于壁纸之上，营造立体/高级感 ──────── */
+  .glass {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border-color: rgba(255, 255, 255, 0.55) !important;
+    box-shadow:
+      0 10px 34px -14px rgba(12, 18, 38, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /* ── 顶栏扫光：周期性高光横扫，强化动态感 ────────────── */
+  .bar-sweep-ray {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 38%;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.30) 50%,
+      transparent 100%
+    );
+    transform: translateX(-130%) skewX(-18deg);
+    animation: bar-sweep 6.5s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes bar-sweep {
+    0%        { transform: translateX(-130%) skewX(-18deg); }
+    55%, 100% { transform: translateX(330%) skewX(-18deg); }
   }
 
   /* ── 焦点发光（速记框 / 输入） ────────────────────────── */
