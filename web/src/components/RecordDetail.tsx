@@ -23,7 +23,7 @@ import {
   typeLabel,
 } from "@/lib/labels"
 import { cn, formatTime } from "@/lib/utils"
-import type { Attempt, RecordItem, Vocabulary } from "@/types"
+import type { Attempt, ImageAsset, RecordItem, Vocabulary } from "@/types"
 
 const str = (p: Record<string, unknown> | null | undefined, k: string): string =>
   !!p && typeof p[k] === "string" ? (p[k] as string) : ""
@@ -171,6 +171,10 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
 
   const setP = (k: string, v: unknown) => setPayload((prev) => ({ ...prev, [k]: v }))
 
+  // 截图是独立资产：字节落盘在服务端，payload 里只有元信息。
+  // 不混进 search_text，也不参与标题 —— 三者各自独立。
+  const images = (Array.isArray(payload.images) ? payload.images : []) as ImageAsset[]
+
   return (
     <div className="flex h-full flex-col">
       {/* 头部：档案封皮（淡极光渐变 + 底部流动高光线） */}
@@ -296,6 +300,24 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                 ) : (
                   <p className="text-[11px] leading-4 text-muted-foreground">未识别到报错原文</p>
                 )}
+              </Section>
+            )}
+
+            {images.length > 0 && (
+              <Section title="截图" hint={`${images.length} 张`} tone="ledger">
+                <div className="flex flex-wrap gap-2">
+                  {images.map((img) => (
+                    <a
+                      key={img.id}
+                      href={img.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block h-20 w-20 overflow-hidden rounded border border-rule transition-colors hover:border-ledger"
+                    >
+                      <img src={img.url} alt="" className="h-full w-full object-cover" />
+                    </a>
+                  ))}
+                </div>
               </Section>
             )}
 

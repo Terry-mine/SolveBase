@@ -1,32 +1,82 @@
 import { useState } from "react"
-import { Inbox, Loader2, Zap } from "lucide-react"
+import { ImageIcon, Inbox, Loader2, X, Zap } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { api } from "@/lib/api"
+import type { ImageAsset } from "@/types"
 
 /**
  * 速记入口。
  *
  * 这是整套系统最关键的组件 —— 输入摩擦决定用户会不会一直用下去。
- * 所以只要求一段文本，类型、标题、报错原文全部后端推断。
+ *
+ * 两条硬规矩：
+ * 1. title 必填。自动推断的标题常常抓不住重点，事后回头补比当场填更贵。
+ * 2. 图片是独立资产。截图落盘存元信息，不混进原始记录文本，也不塞进标题。
+ *    ocr 字段留给将来的「识别图中文字 → 填报错原文」，现在一直是 pending。
  */
 export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void }) {
+  const [title, setTitle] = useState("")
   const [text, setText] = useState("")
+  const [images, setImages] = useState<ImageAsset[]>([])
   const [project, setProject] = useState("")
   const [busy, setBusy] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hint, setHint] = useState<string | null>(null)
 
+  const titleMissing = title.trim().length === 0
+
+  async function addFiles(files: File[]) {
+    if (files.length === 0) return
+    setUploading(true)
+    setError(null)
+    try {
+      const assets = await Promise.all(files.map((f) => api.uploadImage(f)))
+      setImages((prev) => [...prev, ...assets])
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  /** 粘贴图片。只拦截真的带图的粘贴，纯文本照常输入，不打断打字。 */
+  function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const files: File[] = []
+    for (const item of Array.from(e.clipboardData?.items ?? [])) {
+      if (item.kind === "file" && item.type.startsWith("image/")) {
+        const f = item.getAsFile()
+        if (f) files.push(f)
+      }
+    }
+    if (files.length === 0) return
+    e.preventDefault()
+    void addFiles(files)
+  }
+
   async function submit() {
-    if (!text.trim()) return
+    if (titleMissing) return
     setBusy(true)
     setError(null)
     try {
-      const res = await api.capture(text, "web", project.trim() || undefined)
+      const res = await api.capture(
+        text,
+        title.trim(),
+        images,
+        "web",
+        project.trim() || undefined,
+      )
+      setTitle("")
       setText("")
-      setHint(`已存为「${res.record_type}」，自动抽取完成`)
+      setImages([])
+      setHint(
+        images.length > 0
+          ? `已存为「${res.record_type}」，含 ${images.length} 张截图`
+          : `已存为「${res.record_type}」，自动抽取完成`,
+      )
       onCaptured(res.record_id)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
@@ -52,20 +102,83 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
           </span>
         </div>
 
-        <div className="focus-glow rounded-md">
-          <Textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+        {/* 标题：硬性必填，和原始记录分开填 */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-1">
+            <span className="text-[11px] font-bold leading-4">
+              标题<span className="text-seal-ink"> *</span>
+            </span>
+            {titleMissing && (
+              <span className="text-[10px] text-muted-foreground">必填，一句话说清问题</span>
+            )}
+          </div>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
                 void submit()
               }
             }}
-            placeholder={"粘一段报错、贴几句话、写一条注意事项"}
-            className="min-h-[120px] resize-y border-ledger/30 text-xs leading-relaxed focus-visible:ring-0 focus-visible:border-ledger"
+            placeholder="一句话问题陈述（必填）"
+            className={
+              titleMissing
+                ? "h-8 border-seal/40 text-xs"
+                : "h-8 border-pine/40 text-xs focus-visible:border-pine"
+            }
           />
         </div>
+
+        {/* 详情：截图可以直接 Ctrl+V 粘进来 */}
+        <div className="focus-glow rounded-md">
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onPaste={handlePaste}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault()
+                void submit()
+              }
+            }}
+            placeholder={"粘一段报错、贴几句话、写一条注意事项\n截图可直接 ⌘/Ctrl + V 粘进来"}
+            className="min-h-[100px] resize-y border-ledger/30 text-xs leading-relaxed focus-visible:border-ledger focus-visible:ring-0"
+          />
+        </div>
+
+        {/* 图片预览：上传中给个提示，hover 出删除 */}
+        {images.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {images.map((img) => (
+              <div
+                key={img.id}
+                className="group relative h-14 w-14 overflow-hidden rounded border border-rule bg-secondary"
+              >
+                <img src={img.url} alt="" className="h-full w-full object-cover" />
+                <button
+                  type="button"
+                  aria-label="移除这张图"
+                  onClick={() => setImages((prev) => prev.filter((x) => x.id !== img.id))}
+                  className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center bg-ink/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+            {uploading && (
+              <div className="flex h-14 w-14 items-center justify-center rounded border border-dashed border-rule">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        )}
+        {uploading && images.length === 0 && (
+          <p className="flex items-center gap-1 text-[11px] leading-4 text-muted-foreground">
+            <ImageIcon className="h-3 w-3" />
+            图片上传中
+          </p>
+        )}
 
         <Input
           value={project}
@@ -76,12 +189,12 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
 
         <Button
           onClick={() => void submit()}
-          disabled={busy || !text.trim()}
-          className="relative w-full overflow-hidden bg-ledger text-xs shadow-md shadow-ledger/20 hover:bg-ledger-ink"
+          disabled={busy || titleMissing}
+          className="relative w-full overflow-hidden bg-ledger text-xs shadow-md shadow-ledger/20 hover:bg-ledger-ink disabled:opacity-50"
           size="sm"
         >
           {busy && <Loader2 className="h-3 w-3 animate-spin" />}
-          存进去
+          {titleMissing ? "先填标题" : "存进去"}
         </Button>
       </div>
 
@@ -91,9 +204,7 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
           {hint}
         </p>
       )}
-      {error && (
-        <p className="relative mt-2 text-[11px] leading-4 text-seal-ink">{error}</p>
-      )}
+      {error && <p className="relative mt-2 text-[11px] leading-4 text-seal-ink">{error}</p>}
     </div>
   )
 }

@@ -124,13 +124,54 @@ class RecordOut(BaseModel):
     deleted_at: int | None = None
 
 
+class ImageOcr(BaseModel):
+    """OCR 结果占位 —— 为「识别图片文字 → 填进报错原文」预留。
+
+    将来接 OCR 只需两步：加一个 ocr adapter，把 config.ocr_provider 指过去。
+    服务层拿到 asset 后调 ocr.run()，把结果写回 text，再决定是否覆盖
+    error_excerpt。字段和流程现在就留好，免得到时候改数据形状。
+    """
+
+    status: str = "pending"  # pending / done / failed / skipped
+    text: str | None = None
+    engine: str | None = None
+    at: int | None = None
+
+
+class ImageAssetIn(BaseModel):
+    """随记录提交的图片元信息。
+
+    字节已经由上传接口落盘，这里只描述它 —— payload 存元信息不存 base64，
+    免得数据库被截图撑爆，也方便 OCR 直接按路径读原图。
+    """
+
+    id: str
+    filename: str  # 相对 images/ 目录的文件名
+    url: str  # 前端访问路径
+    mime: str = "image/png"
+    size: int = 0
+    width: int | None = None
+    height: int | None = None
+    ocr: ImageOcr = Field(default_factory=ImageOcr)
+
+
+class ImageAssetOut(ImageAssetIn):
+    """上传接口的返回。目前与 In 同形，分开是为了让上传侧字段不外泄。"""
+
+
 class CaptureIn(BaseModel):
-    """速记入口。字段越少越好 —— 输入摩擦决定这套系统能否活下去。"""
+    """速记入口。
+
+    title 硬性必填（前端拦一道，后端也拦）—— 自动推断的标题常常抓不住
+    重点，事后回头补比当场填更贵。
+    """
 
     text: str
     source: str = "web"
     record_type: str | None = None
     project: str | None = None
+    title: str | None = None
+    images: list[ImageAssetIn] = Field(default_factory=list)
 
 
 class CaptureOut(BaseModel):

@@ -35,7 +35,12 @@ class CaptureService:
         # 未知类型原样放行，由 payload 校验器兜底，不让录入流程崩掉
         self.deps.vocab.get(record_type)
 
-        title = guess_title(payload.text)
+        # title 硬性必填。前端已拦一道，这里再拦一次 —— 否则 curl 或
+        # 其他入口能绕过去，库里又会堆满认不出来的「自动标题」。
+        title = (payload.title or "").strip()
+        if not title:
+            raise ValueError("title 必填：先用一句话说清这是什么问题")
+
         data = {
             "record_type": record_type,
             "title": title,
@@ -43,7 +48,10 @@ class CaptureService:
             "project": payload.project,
             "search_text": payload.text,
             "error_excerpt": extract_error_excerpt(payload.text),
-            "payload": validate(record_type, {}),
+            "payload": validate(
+                record_type,
+                {"images": [img.model_dump() for img in payload.images]},
+            ),
             "missing": ["category", "status", "attempts"],
         }
 

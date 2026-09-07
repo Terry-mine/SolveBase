@@ -1,4 +1,5 @@
 import type {
+  ImageAsset,
   ListParams,
   Page,
   RecordItem,
@@ -65,12 +66,37 @@ export const api = {
 
   remove: (id: string) => request<{ deleted: boolean }>(`/records/${id}`, { method: "DELETE" }),
 
-  // 速记：只要求 text，其余后端推断
-  capture: (text: string, source = "web", project?: string) =>
+  // 速记：title 硬性必填，图片作为独立资产随记录提交
+  capture: (
+    text: string,
+    title: string,
+    images: ImageAsset[] = [],
+    source = "web",
+    project?: string,
+  ) =>
     request<{ record_id: string; record_type: string; title: string; needs_review: boolean }>(
       "/capture",
-      { method: "POST", body: JSON.stringify({ text, source, project }) },
+      { method: "POST", body: JSON.stringify({ text, title, images, source, project }) },
     ),
+
+  /** 上传一张图片（粘贴截图用）。走 multipart，不能复用 request ——
+   *  那个函数固定发 application/json，会把 FormData 的 boundary 冲掉。 */
+  uploadImage: async (file: File): Promise<ImageAsset> => {
+    const form = new FormData()
+    form.append("file", file)
+    const res = await fetch(BASE + "/images", { method: "POST", body: form })
+    if (!res.ok) {
+      let detail = res.statusText
+      try {
+        const body = await res.json()
+        detail = body?.detail ?? JSON.stringify(body)
+      } catch {
+        /* 保持 statusText */
+      }
+      throw new Error(`${res.status} ${detail}`)
+    }
+    return res.json() as Promise<ImageAsset>
+  },
 
   syncStatus: () => request<Record<string, unknown>>("/sync/status"),
 }

@@ -29,7 +29,12 @@ def validate(record_type: str, payload: dict[str, Any] | None) -> dict[str, Any]
     """未知类型原样通过，保证加新类型不会让老流程崩。"""
     fn = _REGISTRY.get(record_type)
     data = dict(payload or {})
-    return fn(data) if fn else data
+    out = fn(data) if fn else data
+    # 各类型校验器是白名单重建，会把 images 丢掉。
+    # images 属跨类型通用资产，统一在这里补回，不必每种类型各写一遍。
+    if isinstance(data.get("images"), list):
+        out["images"] = data["images"]
+    return out
 
 
 def _text(value: Any, default: str = "") -> str:

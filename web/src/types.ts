@@ -22,6 +22,28 @@ export interface Snippet {
   copy_count?: number
 }
 
+/** OCR 结果占位。为「识别图中文字 → 填进报错原文」预留，
+ *  现在一直是 pending —— 接 OCR 时不用改数据形状。 */
+export interface ImageOcr {
+  status: "pending" | "done" | "failed" | "skipped"
+  text?: string | null
+  engine?: string | null
+  at?: number | null
+}
+
+/** 图片资产。字节落盘在服务端（data/assets/images/），
+ *  这里只描述它 —— 数据库存元信息，不存 base64。 */
+export interface ImageAsset {
+  id: string
+  filename: string
+  url: string
+  mime: string
+  size: number
+  width?: number | null
+  height?: number | null
+  ocr?: ImageOcr
+}
+
 export interface RecordItem {
   id: string
   record_type: string

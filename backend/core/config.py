@@ -55,6 +55,9 @@ class Settings(BaseSettings):
     embedding_provider: str = "noop"
     reranker_provider: str = "noop"
     sync_provider: str = "noop"
+    # OCR 暂不实现。接的时候：加一个 adapter，把这里指过去，
+    # 识别结果写回 asset.ocr.text，再决定是否覆盖 error_excerpt
+    ocr_provider: str = "noop"
 
     @model_validator(mode="after")
     def _derive_paths(self) -> "Settings":

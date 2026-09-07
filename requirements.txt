@@ -4,6 +4,7 @@ uvicorn[standard]>=0.52
 pydantic>=2.13
 pydantic-settings>=2.15
 PyYAML>=6.0
+python-multipart>=0.0.20   # 图片粘贴上传（FastAPI 解析 multipart 必需）
 
 # 开发 / 测试
 pytest>=9.0
@@ -13,3 +14,5 @@ httpx>=0.28
 # P1 LLM：      openai（DeepSeek/Qwen/GLM 均兼容 OpenAI 接口）
 # P2 Embedding：sentence-transformers 或 FlagEmbedding（本地 bge-m3）
 # P2 Rerank：   FlagEmbedding（bge-reranker-v2-m3）
+# P3 OCR：      rapidocr-onnxruntime（图片文字识别 → 回写 asset.ocr.text → 填报错原文）
+#              数据形状与 config.ocr_provider 已预留，装上 adapter 即可，不用改表

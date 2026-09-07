@@ -6,6 +6,8 @@
 
 from __future__ import annotations
 
+import base64
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -42,7 +44,14 @@ def test_health_reports_migrations_and_providers(client: TestClient) -> None:
 
 
 def test_capture_creates_incident_from_traceback(client: TestClient) -> None:
-    r = client.post("/api/v1/capture", json={"text": TRACEBACK, "source": "web"})
+    r = client.post(
+        "/api/v1/capture",
+        json={
+            "text": TRACEBACK,
+            "source": "web",
+            "title": "容器内连不上宿主机 PostgreSQL",
+        },
+    )
     assert r.status_code == 201
     body = r.json()
     assert body["record_type"] == "incident"
@@ -57,9 +66,53 @@ def test_capture_creates_incident_from_traceback(client: TestClient) -> None:
 def test_capture_guesses_runbook_from_intent(client: TestClient) -> None:
     r = client.post(
         "/api/v1/capture",
-        json={"text": "生产环境发版的完整步骤有哪些，需要先做什么检查", "source": "web"},
+        json={
+            "text": "生产环境发版的完整步骤有哪些，需要先做什么检查",
+            "source": "web",
+            "title": "生产环境发版步骤",
+        },
     )
     assert r.json()["record_type"] == "runbook"
+
+
+def test_capture_requires_title(client: TestClient) -> None:
+    """title 硬性必填：缺了要被挡住，而不是悄悄生成一个认不出的自动标题。"""
+    r = client.post("/api/v1/capture", json={"text": "一段报错"})
+    assert r.status_code == 400
+
+
+def test_capture_keeps_image_assets(client: TestClient) -> None:
+    """截图落盘后：元信息进 payload.images，字节留在磁盘，且不混进原始记录文本。"""
+    png = base64.b64decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    )
+    up = client.post("/api/v1/images", files={"file": ("shot.png", png, "image/png")})
+    assert up.status_code == 201
+    asset = up.json()
+    assert asset["url"].startswith("/api/v1/images/")
+    # OCR 还没接，但字段已经留好，接的时候不用改数据形状
+    assert asset["ocr"]["status"] == "pending"
+
+    # 落盘的图片能按 url 取回
+    assert client.get(asset["url"]).status_code == 200
+
+    r = client.post(
+        "/api/v1/capture",
+        json={
+            "text": "粘贴了一张报错截图",
+            "title": "登录报错截图",
+            "images": [asset],
+        },
+    )
+    assert r.status_code == 201
+    detail = client.get(f"/api/v1/records/{r.json()['record_id']}").json()
+
+    images = detail["payload"]["images"]
+    assert len(images) == 1
+    assert images[0]["filename"] == asset["filename"]
+    # 图片是独立字段，不混进原始记录，也不影响标题
+    assert asset["filename"] not in detail["search_text"]
+    assert detail["title"] == "登录报错截图"
 
 
 def test_category_alias_is_normalized(client: TestClient) -> None:
