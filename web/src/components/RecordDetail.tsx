@@ -13,11 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { api } from "@/lib/api"
-import { categoryOptions, statusOptions, statusTone, typeLabel } from "@/lib/labels"
-import { formatTime } from "@/lib/utils"
+import {
+  categoryOptions,
+  statusLabel,
+  statusOptions,
+  statusTone,
+  typeLabel,
+} from "@/lib/labels"
+import { cn, formatTime } from "@/lib/utils"
 import type { Attempt, RecordItem, Vocabulary } from "@/types"
 
 const str = (p: Record<string, unknown> | null | undefined, k: string): string =>
@@ -25,6 +30,16 @@ const str = (p: Record<string, unknown> | null | undefined, k: string): string =
 
 const arr = (p: Record<string, unknown> | null | undefined, k: string): string[] =>
   !!p && Array.isArray(p[k]) ? (p[k] as unknown[]).map(String) : []
+
+/** 分区标题前的渐变短条配色（不能用动态类名，JIT 扫不到，走映射表） */
+const TONE_BAR = {
+  ledger: "bg-ledger",
+  seal: "bg-seal",
+  pine: "bg-pine",
+  ochre: "bg-ochre",
+} as const
+
+type Tone = keyof typeof TONE_BAR
 
 function Field({
   label,
@@ -37,24 +52,36 @@ function Field({
 }) {
   return (
     <div className="space-y-1">
-      <div className="flex items-baseline gap-2">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
-        {hint && <span className="text-[11px] text-muted-foreground/70">{hint}</span>}
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-[11px] font-bold leading-4 text-muted-foreground">{label}</span>
+        {hint && <span className="text-[10px] text-muted-foreground/70">{hint}</span>}
       </div>
       {children}
     </div>
   )
 }
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+/** 档案分区：卡片承载，标题前一根渐变短条做分区标识 */
+function Section({
+  title,
+  hint,
+  tone = "ledger",
+  children,
+}: {
+  title: string
+  hint?: string
+  tone?: Tone
+  children: React.ReactNode
+}) {
   return (
-    <div className="space-y-2">
-      <div className="flex items-baseline gap-2">
-        <span className="text-xs font-medium">{title}</span>
+    <section className="detail-card space-y-2">
+      <div className="flex items-center gap-2">
+        <span className={cn("tone-bar", TONE_BAR[tone])} />
+        <h3 className="text-[11px] font-bold leading-4 tracking-normal">{title}</h3>
         {hint && <span className="text-[10px] text-muted-foreground">{hint}</span>}
       </div>
       {children}
-    </div>
+    </section>
   )
 }
 
@@ -146,58 +173,57 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
 
   return (
     <div className="flex h-full flex-col">
-      {/* 头部 */}
-      <div className="space-y-3 border-b p-4">
-        <div className="flex items-start gap-2">
-          <div className="flex-1 space-y-2">
+      {/* 头部：档案封皮（淡极光渐变 + 底部流动高光线） */}
+      <div className="detail-hero relative space-y-2.5 border-b border-rule px-5 py-3.5">
+        <div className="header-underline absolute inset-x-0 bottom-0 h-[2px] opacity-60" />
+
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1 space-y-2">
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-8 text-sm font-medium"
+              className="h-9 border-transparent bg-transparent px-0 text-base font-bold shadow-none hover:border-input focus-visible:border-ledger focus-visible:ring-1 focus-visible:ring-ledger/30"
               placeholder="一句话问题陈述"
             />
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Badge variant="outline" className="font-normal">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] leading-4">
+              <span className="text-muted-foreground">
                 {typeLabel(vocab, record.record_type)}
+              </span>
+              <Badge variant={statusTone(record.status)}>
+                {statusLabel(vocab, record.record_type, record.status)}
               </Badge>
               {record.missing.length > 0 && (
-                <Badge variant="warning" className="font-normal">
-                  待补全：{record.missing.join(" / ")}
-                </Badge>
+                <Badge variant="destructive">待补全：{record.missing.join(" / ")}</Badge>
               )}
-              {record.dirty === 1 && (
-                <Badge variant="secondary" className="font-normal">
-                  待同步
-                </Badge>
-              )}
+              {record.dirty === 1 && <Badge variant="outline">待同步</Badge>}
             </div>
           </div>
 
-          <div className="flex shrink-0 gap-1">
-            <Button size="sm" onClick={() => void save()} disabled={busy}>
+          <div className="flex shrink-0 items-center gap-1">
+            <Button size="sm" onClick={() => void save()} disabled={busy} className="text-xs">
               {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
               保存
             </Button>
             <Button variant="ghost" size="icon" onClick={() => void remove()} disabled={busy}>
-              <Trash2 className="h-3 w-3" />
+              <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
 
-        {savedAt && <p className="text-xs text-emerald-700">已保存</p>}
-        {error && <p className="text-xs text-destructive">{error}</p>}
+        {savedAt && <p className="text-[11px] leading-4 text-pine-ink">已保存</p>}
+        {error && <p className="text-[11px] leading-4 text-seal-ink">{error}</p>}
       </div>
 
       {/* 三栏内容 */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          {/* 左：症状与上下文 */}
+      <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-4 xl:grid-cols-3">
+          {/* 左：分类与上下文 */}
           <div className="space-y-4">
-            <Section title="分类">
+            <Section title="分类" tone="ledger">
               <div className="grid grid-cols-2 gap-2">
                 <Field label="状态">
                   <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger className="h-8 text-xs">
+                    <SelectTrigger className="h-7 text-[11px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -215,7 +241,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                     value={category || "__none__"}
                     onValueChange={(v) => setCategory(v === "__none__" ? "" : v)}
                   >
-                    <SelectTrigger className="h-8 text-xs">
+                    <SelectTrigger className="h-7 text-[11px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -236,16 +262,16 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                 <Input
                   value={project}
                   onChange={(e) => setProject(e.target.value)}
-                  className="h-8 text-xs"
+                  className="h-7 text-[11px]"
                   placeholder="归属项目"
                 />
               </Field>
 
-              <Field label="涉及系统" hint="逗号分隔，可多个">
+              <Field label="涉及系统" hint="逗号分隔">
                 <Input
                   value={systems}
                   onChange={(e) => setSystems(e.target.value)}
-                  className="h-8 text-xs"
+                  className="h-7 text-[11px]"
                   placeholder="Docker, PostgreSQL"
                 />
               </Field>
@@ -254,28 +280,27 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                 <Input
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  className="h-8 text-xs"
+                  className="h-7 text-[11px]"
                 />
               </Field>
             </Section>
 
             {record.record_type === "incident" && (
-              <Section title="报错原文">
+              <Section title="报错原文" tone="seal">
                 {record.error_excerpt ? (
                   <>
+                    {/* 全页唯一的深色块：报错本来就是从终端里蹦出来的 */}
                     <div className="code-block">{record.error_excerpt}</div>
                     <CopyButton text={record.error_excerpt} />
                   </>
                 ) : (
-                  <p className="text-xs text-muted-foreground">未识别到报错原文</p>
+                  <p className="text-[11px] leading-4 text-muted-foreground">未识别到报错原文</p>
                 )}
               </Section>
             )}
 
-            <Section title="原始记录">
-              <div className="code-block max-h-52 overflow-y-auto">
-                {record.search_text || "（空）"}
-              </div>
+            <Section title="原始记录" tone="ochre">
+              <div className="raw-block">{record.search_text || "（空）"}</div>
             </Section>
           </div>
 
@@ -283,31 +308,30 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
           <div className="space-y-4">
             {record.record_type === "incident" && (
               <>
-                <Section title="尝试时间线">
+                <Section title="尝试时间线" tone="pine">
                   <AttemptsEditor attempts={attempts} onChange={setAttempts} />
                 </Section>
-                <Separator />
-                <Section title="根因">
+                <Section title="根因" tone="seal">
                   <Textarea
                     value={str(payload, "root_cause")}
                     onChange={(e) => setP("root_cause", e.target.value)}
-                    className="min-h-[80px] text-xs"
+                    className="min-h-[80px] text-xs leading-relaxed"
                     placeholder="为什么会出这个问题"
                   />
                 </Section>
-                <Section title="解法">
+                <Section title="解法" tone="pine">
                   <Textarea
                     value={str(payload, "solution")}
                     onChange={(e) => setP("solution", e.target.value)}
-                    className="min-h-[100px] text-xs"
+                    className="min-h-[100px] text-xs leading-relaxed"
                     placeholder="可执行的步骤"
                   />
                 </Section>
-                <Section title="如何避免再次发生">
+                <Section title="如何避免再次发生" tone="ledger">
                   <Textarea
                     value={str(payload, "prevention")}
                     onChange={(e) => setP("prevention", e.target.value)}
-                    className="min-h-[60px] text-xs"
+                    className="min-h-[60px] text-xs leading-relaxed"
                   />
                 </Section>
               </>
@@ -315,33 +339,36 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
 
             {record.record_type === "runbook" && (
               <>
-                <Section title="前置条件" hint="一行一条">
+                <Section title="前置条件" hint="一行一条" tone="ledger">
                   <Textarea
-                    value={str(payload, "preconditions_text") || arr(payload, "preconditions").join("\n")}
+                    value={
+                      str(payload, "preconditions_text") ||
+                      arr(payload, "preconditions").join("\n")
+                    }
                     onChange={(e) => setP("preconditions_text", e.target.value)}
-                    className="min-h-[80px] text-xs"
+                    className="min-h-[80px] text-xs leading-relaxed"
                   />
                 </Section>
-                <Section title="步骤" hint="一行一步">
+                <Section title="步骤" hint="一行一步" tone="pine">
                   <Textarea
                     value={str(payload, "steps_text") || arr(payload, "steps").join("\n")}
                     onChange={(e) => setP("steps_text", e.target.value)}
-                    className="min-h-[160px] text-xs"
+                    className="min-h-[160px] text-xs leading-relaxed"
                   />
                 </Section>
-                <Section title="校验点">
+                <Section title="校验点" tone="ochre">
                   <Textarea
                     value={str(payload, "verify")}
                     onChange={(e) => setP("verify", e.target.value)}
-                    className="min-h-[60px] text-xs"
+                    className="min-h-[60px] text-xs leading-relaxed"
                     placeholder="怎么确认这一步做对了"
                   />
                 </Section>
-                <Section title="回滚方案">
+                <Section title="回滚方案" tone="seal">
                   <Textarea
                     value={str(payload, "rollback")}
                     onChange={(e) => setP("rollback", e.target.value)}
-                    className="min-h-[80px] text-xs"
+                    className="min-h-[80px] text-xs leading-relaxed"
                   />
                 </Section>
               </>
@@ -349,26 +376,26 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
 
             {record.record_type === "note" && (
               <>
-                <Section title="结论">
+                <Section title="结论" tone="pine">
                   <Textarea
                     value={str(payload, "conclusion")}
                     onChange={(e) => setP("conclusion", e.target.value)}
-                    className="min-h-[80px] text-xs"
+                    className="min-h-[80px] text-xs leading-relaxed"
                     placeholder="这条注意事项到底是什么"
                   />
                 </Section>
-                <Section title="适用场景">
+                <Section title="适用场景" tone="ledger">
                   <Textarea
                     value={str(payload, "scenario")}
                     onChange={(e) => setP("scenario", e.target.value)}
-                    className="min-h-[60px] text-xs"
+                    className="min-h-[60px] text-xs leading-relaxed"
                   />
                 </Section>
-                <Section title="为什么" hint="当初踩过什么坑">
+                <Section title="为什么" hint="当初踩过什么坑" tone="ochre">
                   <Textarea
                     value={str(payload, "reason")}
                     onChange={(e) => setP("reason", e.target.value)}
-                    className="min-h-[80px] text-xs"
+                    className="min-h-[80px] text-xs leading-relaxed"
                   />
                 </Section>
               </>
@@ -377,8 +404,8 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
 
           {/* 右：元信息 */}
           <div className="space-y-4">
-            <Section title="记录信息">
-              <dl className="space-y-1.5 text-xs">
+            <Section title="记录信息" tone="ochre">
+              <dl className="space-y-1.5 text-[11px] leading-4">
                 {[
                   ["创建", formatTime(record.created_at)],
                   ["更新", formatTime(record.updated_at)],
@@ -386,15 +413,12 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                   ["版本号", `rev ${record.rev}`],
                   ["来源设备", record.device_id],
                 ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between gap-2">
-                    <dt className="text-muted-foreground">{k}</dt>
-                    <dd className="truncate">{v}</dd>
+                  <div key={k} className="flex justify-between gap-3">
+                    <dt className="shrink-0 text-muted-foreground">{k}</dt>
+                    <dd className="data-num truncate text-right">{v}</dd>
                   </div>
                 ))}
               </dl>
-              <Badge variant={statusTone(record.status)} className="font-normal">
-                {status}
-              </Badge>
             </Section>
           </div>
         </div>

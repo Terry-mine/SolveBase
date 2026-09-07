@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
-import { AlertCircle, Loader2, Search, X } from "lucide-react"
+import { AlertCircle, Loader2, Search, Sparkles, X } from "lucide-react"
 
+import { BrandBar } from "@/components/BrandBar"
 import { CaptureBox } from "@/components/CaptureBox"
 import { FacetSidebar } from "@/components/FacetSidebar"
 import { NewRecordDialog } from "@/components/NewRecordDialog"
@@ -90,14 +91,17 @@ export default function App() {
   )
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+      <BrandBar total={total} />
+
+      <div className="flex flex-1 overflow-hidden">
       <FacetSidebar vocab={vocab} filters={filters} onChange={setFilters} counts={counts}>
         <CaptureBox onCaptured={(id) => void loadList().then(() => setSelectedId(id))} />
       </FacetSidebar>
 
       {/* 列表区 */}
-      <section className="flex w-[400px] shrink-0 flex-col border-r">
-        <div className="space-y-2 border-b p-3">
+      <section className="flex w-[400px] shrink-0 flex-col border-r border-rule">
+        <div className="space-y-2 border-b border-rule p-3">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -108,14 +112,14 @@ export default function App() {
             />
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-[11px] leading-4 text-muted-foreground">
             {loading && <Loader2 className="h-3 w-3 animate-spin" />}
-            <span>{loading ? "检索中" : `${total} 条`}</span>
+            <span className={loading ? "" : "data-num"}>{loading ? "检索中" : `${total} 条`}</span>
             {hasFilter && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-5 px-1.5 text-xs"
+                className="h-5 px-1.5 text-[11px]"
                 onClick={() => setFilters({})}
               >
                 <X className="h-3 w-3" />
@@ -123,7 +127,7 @@ export default function App() {
               </Button>
             )}
             <div className="ml-auto flex items-center gap-1">
-              {debouncedQuery.trim() && <Badge variant="secondary">关键词模式</Badge>}
+              {debouncedQuery.trim() && <Badge variant="info">关键词模式</Badge>}
               <NewRecordDialog
                 vocab={vocab}
                 onCreated={(id) => void loadList().then(() => setSelectedId(id))}
@@ -132,7 +136,7 @@ export default function App() {
           </div>
 
           {error && (
-            <p className="flex items-center gap-1 text-xs text-destructive">
+            <p className="flex items-center gap-1 text-[11px] leading-4 text-seal-ink">
               <AlertCircle className="h-3 w-3" />
               {error}
             </p>
@@ -167,11 +171,58 @@ export default function App() {
             }}
           />
         ) : (
-          <div className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-            从左边选一条记录查看详情
-          </div>
+          <DetailEmpty />
         )}
       </section>
+      </div>
+    </div>
+  )
+}
+
+function DetailEmpty() {
+  return (
+    <div className="relative flex h-full items-center justify-center overflow-hidden p-8">
+      {/* 极光装饰背景 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-3xl aurora-bg"
+      />
+      {/* 网格装饰 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 grid-bg opacity-30"
+      />
+
+      <div className="relative max-w-md space-y-5 text-center">
+        {/* 标题区 */}
+        <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-card shadow-lg shadow-ledger/15 ring-1 ring-rule">
+          <Sparkles className="h-7 w-7 text-ledger" />
+          <span className="absolute -right-1 -top-1 h-3 w-3 animate-[glow-pulse_2.4s_ease-in-out_infinite] rounded-full bg-aurora-mid" />
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold tracking-tight">从左边选一条记录</h2>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            翻一下过去踩过的坑——比重新踩一遍划算得多。
+          </p>
+        </div>
+
+        {/* 三个引导提示 */}
+        <div className="grid grid-cols-1 gap-2 text-left text-[11px] leading-5 text-muted-foreground">
+          <div className="flex items-start gap-2 rounded-md border border-rule bg-card/60 px-3 py-2">
+            <span className="mt-0.5 text-ledger">▸</span>
+            <span>点列表项，或用顶栏搜索框（Ctrl + K）</span>
+          </div>
+          <div className="flex items-start gap-2 rounded-md border border-rule bg-card/60 px-3 py-2">
+            <span className="mt-0.5 text-ledger">▸</span>
+            <span>侧栏可按类型 / 状态 / 项目过滤</span>
+          </div>
+          <div className="flex items-start gap-2 rounded-md border border-rule bg-card/60 px-3 py-2">
+            <span className="mt-0.5 text-ledger">▸</span>
+            <span>左下角速记框粘一段报错，自动建档</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

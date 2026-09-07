@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils"
 import type { Attempt } from "@/types"
 
 const WORKED_OPTIONS = [
-  { value: 0, label: "无效", tone: "text-muted-foreground" },
-  { value: 1, label: "奏效", tone: "text-emerald-700" },
-  { value: -1, label: "恶化", tone: "text-destructive" },
+  { value: 0, label: "无效", tone: "text-neutral-ink" },
+  { value: 1, label: "奏效", tone: "text-pine-ink" },
+  { value: -1, label: "恶化", tone: "text-seal-ink" },
 ] as const
 
 /**
@@ -58,16 +58,16 @@ export function AttemptsEditor({
               className={cn(
                 "absolute left-0 top-1 flex h-5 w-5 items-center justify-center rounded-full border text-[10px]",
                 a.worked === 1
-                  ? "border-emerald-300 bg-emerald-100 text-emerald-700"
+                  ? "border-pine/40 bg-pine/15 text-pine-ink shadow-[0_0_8px_-2px_hsl(var(--pine)/0.5)]"
                   : a.worked === -1
-                    ? "border-red-300 bg-red-100 text-destructive"
-                    : "border-border bg-muted text-muted-foreground",
+                    ? "border-seal/40 bg-seal/15 text-seal-ink shadow-[0_0_8px_-2px_hsl(var(--seal)/0.5)]"
+                    : "border-rule bg-muted text-muted-foreground",
               )}
             >
               {a.worked === 1 ? "✓" : a.worked === -1 ? "✕" : "·"}
             </div>
             {index < attempts.length - 1 && (
-              <div className="absolute left-[10px] top-7 h-[calc(100%-1rem)] w-px bg-border" />
+              <div className="absolute left-[10px] top-7 h-[calc(100%-1rem)] w-px bg-gradient-to-b from-rule to-transparent" />
             )}
 
             <div className={cn("space-y-1.5", failed && "opacity-70")}>
