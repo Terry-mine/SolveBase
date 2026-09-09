@@ -58,8 +58,8 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
             className={cn(
               "lift group relative block w-full py-2.5 pl-5 pr-4 text-left",
               selected
-                ? "bg-white/40 bg-gradient-to-br from-ledger/[0.08] via-ledger/[0.04] to-transparent"
-                : "hover:bg-white/50",
+                ? "bg-white/32 bg-gradient-to-br from-ledger/[0.08] via-ledger/[0.04] to-transparent"
+                : "hover:bg-white/28",
             )}
           >
             {/* 状态色条 */}

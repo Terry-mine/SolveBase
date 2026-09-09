@@ -155,7 +155,7 @@ export function FacetSidebar({ vocab, filters, onChange, counts, children }: Pro
                 onChange({ ...filters, project: e.target.value || undefined })
               }
               placeholder="输入项目名过滤"
-              className="h-7 w-full rounded-sm border border-white/45 bg-white/45 px-2 text-[11px] placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="h-7 w-full rounded-sm border border-white/50 bg-white/32 px-2 text-[11px] placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
           </Group>
 

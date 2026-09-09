@@ -32,17 +32,17 @@
     --ochre-ink:   38 72% 30%;
     --neutral-ink: 210  9% 42%;
 
-    /* 装饰渐变极光色（仅用于 BrandBar / 空状态插画 / 强调边框） */
-    --aurora-start: 216 90% 60%;   /* 极光蓝 #4C7DF0 */
-    --aurora-mid:   268 85% 65%;   /* 极光紫 #8B5CF6 */
-    --aurora-end:   188 90% 55%;   /* 极光青 #20C9DD */
+    /* 装饰渐变色：与壁纸同族（粉 → 薰衣草 → 天蓝），去掉了原来的青绿段 */
+    --aurora-start: 344 72% 62%;   /* 霞粉   #DE5B82 */
+    --aurora-mid:   292 50% 64%;   /* 薰衣草 #A874D8 */
+    --aurora-end:   202 78% 56%;   /* 天蓝   #3AA5E0 */
 
-    /* header 深色渐变（白字专用底）实测：纯白 5.56–10.54:1，白85% 最低 4.51 */
-    --hdr-1: 226 70% 34%;          /* 深蓝 #1A3693 */
-    --hdr-2: 272 58% 40%;          /* 紫   #6A2BA1 */
-    --hdr-3: 190 74% 30%;          /* 青   #147285 */
+    /* header 渐变（白字专用底）：取壁纸的粉/蓝并压深，实测纯白 ≥6.2:1、白85% ≥4.9:1 */
+    --hdr-1: 342 52% 43%;          /* 玫瑰   #B03558 */
+    --hdr-2: 296 34% 42%;          /* 薰衣草紫 #7A4590 */
+    --hdr-3: 208 56% 36%;          /* 天蓝   #2B6C97 */
     /* 深色底上的点缀色（对渐变各段 ≥3.4:1，勿用深色系） */
-    --on-dark-accent: 186 90% 55%; /* 亮青   #25DFF4 */
+    --on-dark-accent: 190 96% 62%; /* 亮青   #3FE2F5 */
     --on-dark-warn:    42 96% 62%; /* 亮琥珀 #FBC341 */
 
     /* 语义令牌 */
@@ -253,8 +253,8 @@
     background: linear-gradient(
       90deg,
       hsl(var(--on-dark-accent)) 0%,
-      hsl(var(--aurora-mid)) 48%,
-      hsl(var(--on-dark-warn)) 100%
+      hsl(292 80% 78%) 46%,
+      hsl(344 92% 76%) 100%
     );
     background-size: 200% 100%;
     animation: gradient-x 7s ease infinite;
@@ -324,37 +324,51 @@
   .glass {
     position: relative;
     isolation: isolate;
-    background: linear-gradient(
-      158deg,
-      rgba(255, 255, 255, 0.20) 0%,
-      rgba(255, 255, 255, 0.11) 44%,
-      rgba(255, 255, 255, 0.17) 100%
-    );
-    /* brightness 只轻微提亮：浅色壁纸经不起 1.08 那种提亮，会过曝发白 */
-    backdrop-filter: blur(26px) saturate(180%) brightness(1.02);
-    -webkit-backdrop-filter: blur(26px) saturate(180%) brightness(1.02);
-    border-color: rgba(255, 255, 255, 0.30) !important;
+    /* 白只做"雾"，不做"漆"：0.05~0.14 才透得出壁纸。
+       第二层是同色系淡粉蓝，让面板带一点壁纸的调子，不至于像一块白板。 */
+    background:
+      linear-gradient(
+        158deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0.05) 44%,
+        rgba(255, 255, 255, 0.11) 100%
+      ),
+      linear-gradient(
+        120deg,
+        rgba(255, 176, 205, 0.10) 0%,
+        rgba(168, 214, 245, 0.10) 100%
+      );
+    /* blur 从 26 降到 14：糊到看不清就不是玻璃了。saturate 拉高补回色彩浓度 */
+    backdrop-filter: blur(14px) saturate(200%) brightness(1.03);
+    -webkit-backdrop-filter: blur(14px) saturate(200%) brightness(1.03);
+    border-color: rgba(255, 255, 255, 0.45) !important;
     box-shadow:
-      0 20px 54px -20px rgba(9, 14, 30, 0.46),
-      0 2px 8px -2px rgba(9, 14, 30, 0.18);
+      0 20px 54px -22px rgba(9, 14, 30, 0.32),
+      0 2px 8px -3px rgba(9, 14, 30, 0.12);
   }
 
-  /* ── 强玻璃：侧栏这类小字密集区用。白 0.40~0.52，既透壁纸又保可读 ── */
+  /* ── 强玻璃：侧栏这类小字密集区用。白 0.24~0.34（原 0.42~0.54，太糊） ── */
   .glass-strong {
     position: relative;
     isolation: isolate;
-    background: linear-gradient(
-      158deg,
-      rgba(255, 255, 255, 0.54) 0%,
-      rgba(255, 255, 255, 0.42) 44%,
-      rgba(255, 255, 255, 0.50) 100%
-    );
-    backdrop-filter: blur(26px) saturate(170%) brightness(1.01);
-    -webkit-backdrop-filter: blur(26px) saturate(170%) brightness(1.01);
-    border-color: rgba(255, 255, 255, 0.42) !important;
+    background:
+      linear-gradient(
+        158deg,
+        rgba(255, 255, 255, 0.34) 0%,
+        rgba(255, 255, 255, 0.24) 44%,
+        rgba(255, 255, 255, 0.30) 100%
+      ),
+      linear-gradient(
+        120deg,
+        rgba(255, 176, 205, 0.10) 0%,
+        rgba(168, 214, 245, 0.10) 100%
+      );
+    backdrop-filter: blur(16px) saturate(190%) brightness(1.02);
+    -webkit-backdrop-filter: blur(16px) saturate(190%) brightness(1.02);
+    border-color: rgba(255, 255, 255, 0.52) !important;
     box-shadow:
-      0 20px 54px -20px rgba(9, 14, 30, 0.38),
-      0 2px 8px -2px rgba(9, 14, 30, 0.14);
+      0 20px 54px -22px rgba(9, 14, 30, 0.26),
+      0 2px 8px -3px rgba(9, 14, 30, 0.10);
   }
 
   /* 第 2 层：上沿高光带 —— 玻璃"有边缘"的关键 */
@@ -383,8 +397,8 @@
     border-radius: inherit;
     pointer-events: none;
     box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.55),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.15);
+      inset 0 1px 1px rgba(255, 255, 255, 0.42),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.14);
   }
 
   /* ── 边框流光：选中项 / 重点卡片外沿跑一圈光 ───────────── */
@@ -488,8 +502,8 @@
   /* 详情页分区卡片：淡边框 + hover 抬起 */
   .detail-card {
     @apply rounded-lg border p-3 backdrop-blur-md;
-    background-color: rgba(255, 255, 255, 0.42);
-    border-color: rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 1px 2px hsl(var(--ink) / 0.04);
     transition:
       box-shadow 0.2s ease,

@@ -199,7 +199,7 @@ function DetailEmpty() {
 
       <div className="relative max-w-md space-y-5 text-center">
         {/* 标题区 */}
-        <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/60 shadow-lg shadow-ledger/15 ring-1 ring-white/60 backdrop-blur-md">
+        <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/45 shadow-lg shadow-ledger/15 ring-1 ring-white/65 backdrop-blur-md">
           {/* 边框流光：空状态是页面焦点，用一圈跑动的光把视线引过去 */}
           <span className="beam-border rounded-2xl" aria-hidden="true" />
           <Sparkles className="h-7 w-7 text-ledger" />
@@ -215,15 +215,15 @@ function DetailEmpty() {
 
         {/* 三个引导提示 */}
         <div className="grid grid-cols-1 gap-2 text-left text-[11px] leading-5 text-muted-foreground">
-          <div className="flex items-start gap-2 rounded-md border border-white/45 bg-white/40 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-md border border-white/50 bg-white/28 px-3 py-2">
             <span className="mt-0.5 text-ledger">▸</span>
             <span>点列表项，或用顶栏搜索框（Ctrl + K）</span>
           </div>
-          <div className="flex items-start gap-2 rounded-md border border-white/45 bg-white/40 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-md border border-white/50 bg-white/28 px-3 py-2">
             <span className="mt-0.5 text-ledger">▸</span>
             <span>侧栏可按类型 / 状态 / 项目过滤</span>
           </div>
-          <div className="flex items-start gap-2 rounded-md border border-white/45 bg-white/40 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-md border border-white/50 bg-white/28 px-3 py-2">
             <span className="mt-0.5 text-ledger">▸</span>
             <span>左下角速记框粘一段报错，自动建档</span>
           </div>

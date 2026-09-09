@@ -8,7 +8,8 @@ interface Props {
 }
 
 /**
- * 顶部品牌栏。整条横贯渐变（深蓝→紫→青），是页面的"门面"。
+ * 顶部品牌栏。整条横贯渐变（玫瑰→薰衣草→天蓝），是页面的"门面"。
+ * 配色取自壁纸的粉/蓝并压深，与下方壁纸同一族，避免上下两段色调打架。
  * 深色底上所有文字走白色体系：主文字纯白，次要文字 white/85（实测最低 4.51:1）。
  * 点缀色只能用亮青/亮琥珀这类高亮色，深色系在深底上会消失。
  */
@@ -31,7 +32,7 @@ export function BrandBar({ total }: Props) {
       {/* 右上角柔和光斑，让渐变有纵深 */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 -top-24 h-56 w-80 rounded-full bg-[hsl(var(--on-dark-accent))] opacity-25 blur-3xl"
+        className="pointer-events-none absolute -right-24 -top-24 h-56 w-80 rounded-full bg-[hsl(344_92%_74%)] opacity-30 blur-3xl"
       />
       {/* 左下角第二处光斑，避免右重左轻 */}
       <div
