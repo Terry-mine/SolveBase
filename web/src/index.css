@@ -76,8 +76,10 @@
     /* 圆角略放大，配合动效更柔和 */
     --radius: 0.5rem;
 
-    --font-sans: "Inter", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei",
-      "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+    /* 手写感的西文 + 楷体中文字：西文在前中文在后，中文自动 fallback 到楷体。
+       Segoe Script 字形偏高、连笔多，行高必须比常规无衬线体松（见 body 与 fontSize）。 */
+    --font-sans: "Segoe Script", "Segoe UI", "KaiTi", "STKaiti", "Kaiti SC",
+      "楷体", "楷体_GB2312", "Microsoft YaHei", sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "Cascadia Code",
       Consolas, monospace;
   }
@@ -93,7 +95,8 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
-    line-height: 1.65;
+    /* 手写体 + 楷体比无衬线体\"占地\"，行高放松到 1.8 才不粘连 */
+    line-height: 1.8;
     -webkit-font-smoothing: antialiased;
     line-break: strict;
     word-break: normal;
