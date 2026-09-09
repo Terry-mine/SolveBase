@@ -116,14 +116,14 @@ export default function App() {
             />
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] leading-4 text-muted-foreground">
+          <div className="flex items-center gap-2 text-[13px] leading-5 text-muted-foreground">
             {loading && <Loader2 className="h-3 w-3 animate-spin" />}
             <span className={loading ? "" : "data-num"}>{loading ? "检索中" : `${total} 条`}</span>
             {hasFilter && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-5 px-1.5 text-[11px]"
+                className="h-6 px-2 text-[13px]"
                 onClick={() => setFilters({})}
               >
                 <X className="h-3 w-3" />
@@ -140,7 +140,7 @@ export default function App() {
           </div>
 
           {error && (
-            <p className="flex items-center gap-1 text-[11px] leading-4 text-seal-ink">
+            <p className="flex items-center gap-1 text-[13px] leading-5 text-seal-ink">
               <AlertCircle className="h-3 w-3" />
               {error}
             </p>
@@ -214,7 +214,7 @@ function DetailEmpty() {
         </div>
 
         {/* 三个引导提示 */}
-        <div className="grid grid-cols-1 gap-2 text-left text-[11px] leading-5 text-muted-foreground">
+        <div className="grid grid-cols-1 gap-2 text-left text-[13px] leading-6 text-muted-foreground">
           <div className="flex items-start gap-2 rounded-md border border-white/50 bg-white/28 px-3 py-2">
             <span className="mt-0.5 text-ledger">▸</span>
             <span>点列表项，或用顶栏搜索框（Ctrl + K）</span>

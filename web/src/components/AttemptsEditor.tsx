@@ -56,7 +56,7 @@ export function AttemptsEditor({
             {/* 时间线节点与连线 */}
             <div
               className={cn(
-                "absolute left-0 top-1 flex h-5 w-5 items-center justify-center rounded-full border text-[10px]",
+                "absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border text-[12px]",
                 a.worked === 1
                   ? "border-pine/40 bg-pine/15 text-pine-ink shadow-[0_0_8px_-2px_hsl(var(--pine)/0.5)]"
                   : a.worked === -1
@@ -75,13 +75,13 @@ export function AttemptsEditor({
                 value={a.hypothesis ?? ""}
                 onChange={(e) => update(index, { hypothesis: e.target.value })}
                 placeholder="当时的假设"
-                className={cn("h-7 text-xs", failed && "line-through decoration-muted-foreground/40")}
+                className={cn("h-8 text-xs", failed && "line-through decoration-muted-foreground/40")}
               />
               <Input
                 value={a.action ?? ""}
                 onChange={(e) => update(index, { action: e.target.value })}
                 placeholder="做了什么"
-                className="h-7 text-xs"
+                className="h-8 text-xs"
               />
               <Textarea
                 value={a.observation ?? ""}
@@ -109,7 +109,7 @@ export function AttemptsEditor({
                   variant="ghost"
                   size="sm"
                   onClick={() => remove(index)}
-                  className="ml-auto h-6 px-2 text-xs text-muted-foreground"
+                  className="ml-auto h-7 px-2 text-xs text-muted-foreground"
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>

@@ -96,8 +96,8 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
       <div className="relative space-y-2">
         <div className="mb-1 flex items-center gap-1.5">
           <Zap className="h-3.5 w-3.5 text-ledger" />
-          <span className="text-[13px] font-bold leading-5">速记</span>
-          <span className="ml-auto data-num rounded bg-ledger/10 px-1.5 py-px text-[10px] font-bold text-ledger-ink">
+          <span className="text-[15px] font-bold leading-6">速记</span>
+          <span className="ml-auto data-num rounded bg-ledger/10 px-1.5 py-px text-[12px] font-bold text-ledger-ink">
             ⌘ ↵
           </span>
         </div>
@@ -105,11 +105,11 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
         {/* 标题：硬性必填，和原始记录分开填 */}
         <div className="space-y-1">
           <div className="flex items-center gap-1">
-            <span className="text-[11px] font-bold leading-4">
+            <span className="text-[13px] font-bold leading-5">
               标题<span className="text-seal-ink"> *</span>
             </span>
             {titleMissing && (
-              <span className="text-[10px] text-muted-foreground">必填，一句话说清问题</span>
+              <span className="text-[12px] text-muted-foreground">必填，一句话说清问题</span>
             )}
           </div>
           <Input
@@ -124,8 +124,8 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
             placeholder="一句话问题陈述（必填）"
             className={
               titleMissing
-                ? "h-8 border-seal/40 text-xs"
-                : "h-8 border-pine/40 text-xs focus-visible:border-pine"
+                ? "h-9 border-seal/40 text-xs"
+                : "h-9 border-pine/40 text-xs focus-visible:border-pine"
             }
           />
         </div>
@@ -174,7 +174,7 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
           </div>
         )}
         {uploading && images.length === 0 && (
-          <p className="flex items-center gap-1 text-[11px] leading-4 text-muted-foreground">
+          <p className="flex items-center gap-1 text-[13px] leading-5 text-muted-foreground">
             <ImageIcon className="h-3 w-3" />
             图片上传中
           </p>
@@ -184,7 +184,7 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
           value={project}
           onChange={(e) => setProject(e.target.value)}
           placeholder="项目（可留空，事后补）"
-          className="h-7 text-[11px]"
+          className="h-8 text-[13px]"
         />
 
         <Button
@@ -206,12 +206,12 @@ export function CaptureBox({ onCaptured }: { onCaptured: (id: string) => void })
       </div>
 
       {hint && (
-        <p className="relative mt-2 flex items-center gap-1 text-[11px] leading-4 text-pine-ink">
+        <p className="relative mt-2 flex items-center gap-1 text-[13px] leading-5 text-pine-ink">
           <Inbox className="h-3 w-3" />
           {hint}
         </p>
       )}
-      {error && <p className="relative mt-2 text-[11px] leading-4 text-seal-ink">{error}</p>}
+      {error && <p className="relative mt-2 text-[13px] leading-5 text-seal-ink">{error}</p>}
     </div>
   )
 }

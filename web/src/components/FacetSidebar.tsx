@@ -17,7 +17,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
     <div className="relative border-t border-rule px-3 py-2.5">
       <div className="mb-1.5 flex items-center gap-1.5">
         <span className="h-1 w-1 rounded-full bg-ledger" />
-        <span className="text-[11px] font-bold leading-4 text-muted-foreground">
+        <span className="text-[13px] font-bold leading-5 text-muted-foreground">
           {title}
         </span>
       </div>
@@ -41,7 +41,7 @@ function Option({
     <button
       onClick={onClick}
       className={cn(
-        "relative flex w-full items-center justify-between rounded-sm py-1 pl-2.5 pr-2 text-left text-[13px] leading-5 transition-all duration-150",
+        "relative flex w-full items-center justify-between rounded-sm py-1 pl-2.5 pr-2 text-left text-[15px] leading-6 transition-all duration-150",
         active
           ? "bg-gradient-to-r from-ledger/15 to-ledger/5 font-bold text-ledger-ink selection-glow"
           : "text-foreground/80 hover:bg-accent/70 hover:translate-x-0.5",
@@ -54,7 +54,7 @@ function Option({
       {count !== undefined && count > 0 && (
         <span
           className={cn(
-            "data-num ml-2 shrink-0 rounded px-1 text-[10px] leading-4",
+            "data-num ml-2 shrink-0 rounded px-1 text-[12px] leading-5",
             active ? "bg-ledger/15 font-bold" : "text-muted-foreground",
           )}
         >
@@ -75,7 +75,7 @@ export function FacetSidebar({ vocab, filters, onChange, counts, children }: Pro
   const categories = activeType ? categoryOptions(vocab, activeType) : []
 
   return (
-    <aside className="glass-strong relative flex w-64 shrink-0 flex-col overflow-hidden border-r">
+    <aside className="glass-strong relative flex w-80 shrink-0 flex-col overflow-hidden border-r">
       {children}
 
       {/* 极淡网格背景，仅下半部分 */}
@@ -155,7 +155,7 @@ export function FacetSidebar({ vocab, filters, onChange, counts, children }: Pro
                 onChange({ ...filters, project: e.target.value || undefined })
               }
               placeholder="输入项目名过滤"
-              className="h-7 w-full rounded-sm border border-white/50 bg-white/32 px-2 text-[11px] placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="h-8 w-full rounded-sm border border-white/50 bg-white/32 px-2 text-[13px] placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
           </Group>
 
@@ -165,7 +165,7 @@ export function FacetSidebar({ vocab, filters, onChange, counts, children }: Pro
                 词表提示
               </Badge>
               {vocab.issues.map((i, idx) => (
-                <p key={idx} className="text-[11px] leading-4 text-muted-foreground">
+                <p key={idx} className="text-[13px] leading-5 text-muted-foreground">
                   {i.message}
                 </p>
               ))}

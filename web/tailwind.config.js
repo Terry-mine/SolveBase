@@ -68,6 +68,17 @@ export default {
         sans: "var(--font-sans)",
         mono: "var(--font-mono)",
       },
+      // 全站字号整体上调两号（2026-09-09）：xs 12→13、sm 14→15，行高同步跟上。
+      // 手写任意值（text-[11px] 等）在 src 里已一并 +2，保持与这套 scale 同序。
+      fontSize: {
+        xs: ["13px", "1.45"],
+        sm: ["15px", "1.5"],
+        base: ["16px", "1.6"],
+        lg: ["18px", "1.55"],
+        xl: ["21px", "1.45"],
+        "2xl": ["25px", "1.35"],
+        "3xl": ["30px", "1.25"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

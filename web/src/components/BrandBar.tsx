@@ -48,8 +48,8 @@ export function BrandBar({ total }: Props) {
           <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[hsl(var(--on-dark-accent))] ring-2 ring-[hsl(var(--hdr-1))] animate-[glow-pulse_2.4s_ease-in-out_infinite]" />
         </div>
         <div className="flex flex-col leading-none">
-          <span className="text-[15px] font-bold tracking-tight text-white">SolveBase</span>
-          <span className="mt-0.5 text-[10px] text-white/85">故障排查档案库</span>
+          <span className="text-[17px] font-bold tracking-tight text-white">SolveBase</span>
+          <span className="mt-0.5 text-[12px] text-white/85">故障排查档案库</span>
         </div>
       </div>
 
@@ -57,7 +57,7 @@ export function BrandBar({ total }: Props) {
       <div className="mx-2 h-6 w-px bg-white/25" />
 
       {/* 状态指示 */}
-      <div className="hidden items-center gap-3 text-[11px] text-white/85 md:flex">
+      <div className="hidden items-center gap-3 text-[13px] text-white/85 md:flex">
         <span className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--on-dark-accent))] animate-[glow-pulse_2.4s_ease-in-out_infinite]" />
           本地运行中
@@ -69,14 +69,14 @@ export function BrandBar({ total }: Props) {
 
       <div className="ml-auto flex items-center gap-3">
         {/* 日期 */}
-        <span className="data-num hidden text-[11px] text-white/85 sm:inline">{date}</span>
+        <span className="data-num hidden text-[13px] text-white/85 sm:inline">{date}</span>
         {/* 时钟：时分秒等宽 */}
         <div className="data-num flex items-baseline rounded-md border border-white/25 bg-white/12 px-2.5 py-1 tabular-nums">
           <span className="text-base font-bold leading-none text-white">{hh}</span>
           <span className="mx-0.5 text-base leading-none text-white/50">:</span>
           <span className="text-base font-bold leading-none text-white">{mm}</span>
           <span className="mx-0.5 text-base leading-none text-white/50">:</span>
-          <span className="text-[13px] font-bold leading-none text-[hsl(var(--on-dark-warn))]">
+          <span className="text-[15px] font-bold leading-none text-[hsl(var(--on-dark-warn))]">
             {ss}
           </span>
         </div>

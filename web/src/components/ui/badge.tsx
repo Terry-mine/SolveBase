@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils"
  * 状态类信息优先用列表左侧色条承载，徽章只用于必须点名的场合。
  */
 const badgeVariants = cva(
-  "inline-flex items-center gap-1 rounded-sm border px-1.5 py-px text-[11px] leading-4 font-normal whitespace-nowrap",
+  "inline-flex items-center gap-1 rounded-sm border px-1.5 py-px text-[13px] leading-5 font-normal whitespace-nowrap",
   {
     variants: {
       variant: {

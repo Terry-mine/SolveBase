@@ -53,8 +53,8 @@ function Field({
   return (
     <div className="space-y-1">
       <div className="flex items-baseline gap-1.5">
-        <span className="text-[11px] font-bold leading-4 text-muted-foreground">{label}</span>
-        {hint && <span className="text-[10px] text-muted-foreground/70">{hint}</span>}
+        <span className="text-[13px] font-bold leading-5 text-muted-foreground">{label}</span>
+        {hint && <span className="text-[12px] text-muted-foreground/70">{hint}</span>}
       </div>
       {children}
     </div>
@@ -77,8 +77,8 @@ function Section({
     <section className="detail-card space-y-2">
       <div className="flex items-center gap-2">
         <span className={cn("tone-bar", TONE_BAR[tone])} />
-        <h3 className="text-[11px] font-bold leading-4 tracking-normal">{title}</h3>
-        {hint && <span className="text-[10px] text-muted-foreground">{hint}</span>}
+        <h3 className="text-[13px] font-bold leading-5 tracking-normal">{title}</h3>
+        {hint && <span className="text-[12px] text-muted-foreground">{hint}</span>}
       </div>
       {children}
     </section>
@@ -189,7 +189,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
               className="h-9 border-transparent bg-transparent px-0 text-base font-bold shadow-none hover:border-input focus-visible:border-ledger focus-visible:ring-1 focus-visible:ring-ledger/30"
               placeholder="一句话问题陈述"
             />
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] leading-4">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] leading-5">
               <span className="text-muted-foreground">
                 {typeLabel(vocab, record.record_type)}
               </span>
@@ -214,8 +214,8 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
           </div>
         </div>
 
-        {savedAt && <p className="text-[11px] leading-4 text-pine-ink">已保存</p>}
-        {error && <p className="text-[11px] leading-4 text-seal-ink">{error}</p>}
+        {savedAt && <p className="text-[13px] leading-5 text-pine-ink">已保存</p>}
+        {error && <p className="text-[13px] leading-5 text-seal-ink">{error}</p>}
       </div>
 
       {/* 三栏内容 */}
@@ -227,7 +227,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
               <div className="grid grid-cols-2 gap-2">
                 <Field label="状态">
                   <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger className="h-7 text-[11px]">
+                    <SelectTrigger className="h-8 text-[13px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -245,7 +245,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                     value={category || "__none__"}
                     onValueChange={(v) => setCategory(v === "__none__" ? "" : v)}
                   >
-                    <SelectTrigger className="h-7 text-[11px]">
+                    <SelectTrigger className="h-8 text-[13px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -266,7 +266,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                 <Input
                   value={project}
                   onChange={(e) => setProject(e.target.value)}
-                  className="h-7 text-[11px]"
+                  className="h-8 text-[13px]"
                   placeholder="归属项目"
                 />
               </Field>
@@ -275,7 +275,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                 <Input
                   value={systems}
                   onChange={(e) => setSystems(e.target.value)}
-                  className="h-7 text-[11px]"
+                  className="h-8 text-[13px]"
                   placeholder="Docker, PostgreSQL"
                 />
               </Field>
@@ -284,7 +284,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                 <Input
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  className="h-7 text-[11px]"
+                  className="h-8 text-[13px]"
                 />
               </Field>
             </Section>
@@ -298,7 +298,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
                     <CopyButton text={record.error_excerpt} />
                   </>
                 ) : (
-                  <p className="text-[11px] leading-4 text-muted-foreground">未识别到报错原文</p>
+                  <p className="text-[13px] leading-5 text-muted-foreground">未识别到报错原文</p>
                 )}
               </Section>
             )}
@@ -427,7 +427,7 @@ export function RecordDetail({ record, vocab, onSaved, onDeleted }: Props) {
           {/* 右：元信息 */}
           <div className="space-y-4">
             <Section title="记录信息" tone="ochre">
-              <dl className="space-y-1.5 text-[11px] leading-4">
+              <dl className="space-y-1.5 text-[13px] leading-5">
                 {[
                   ["创建", formatTime(record.created_at)],
                   ["更新", formatTime(record.updated_at)],

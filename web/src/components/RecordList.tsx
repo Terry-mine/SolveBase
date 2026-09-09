@@ -36,7 +36,7 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
     return (
       <div className="px-6 py-16 text-center">
         <p className="text-sm text-muted-foreground">还没有记录</p>
-        <p className="mt-1 text-[11px] text-muted-foreground/70">
+        <p className="mt-1 text-[13px] text-muted-foreground/70">
           用左下角速记框粘一段报错试试
         </p>
       </div>
@@ -91,14 +91,15 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
               <div className="min-w-0 flex-1">
                 <div
                   className={cn(
-                    "truncate text-sm leading-6",
+                    /* 报错标题常常很长：允许换到第二行，两行放不下才省略 */
+                    "line-clamp-2 break-words text-sm leading-6",
                     selected ? "font-bold text-ledger" : "font-medium text-ink",
                   )}
                 >
                   {item.title}
                 </div>
 
-                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] leading-4">
+                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] leading-5">
                   <span className="text-muted-foreground">
                     {typeLabel(vocab, item.record_type)}
                   </span>
@@ -110,7 +111,7 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
                   )}
 
                   <span className={cn("flex items-center gap-1", TONE_DOT[tone])}>
-                    <span className="text-[9px] leading-none">●</span>
+                    <span className="text-[10px] leading-none">●</span>
                     {statusLabel(vocab, item.record_type, item.status)}
                   </span>
 
@@ -119,7 +120,7 @@ export function RecordList({ items, selectedId, vocab, onSelect }: Props) {
                   )}
                 </div>
 
-                <div className="mt-1 flex items-baseline gap-2 text-[11px] leading-4 text-muted-foreground">
+                <div className="mt-1 flex items-baseline gap-2 text-[13px] leading-5 text-muted-foreground">
                   <span className="truncate">{item.project || "—"}</span>
                   <span className="data-num ml-auto shrink-0 tabular-nums">
                     {formatTime(item.updated_at)}

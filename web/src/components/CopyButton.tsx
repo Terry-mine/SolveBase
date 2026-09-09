@@ -18,7 +18,7 @@ export function CopyButton({ text, label = "复制" }: { text: string; label?: s
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={copy} className="h-6 px-2 text-xs">
+    <Button variant="ghost" size="sm" onClick={copy} className="h-7 px-2 text-xs">
       {done ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
       {done ? "已复制" : label}
     </Button>
